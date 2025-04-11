@@ -1,20 +1,26 @@
-package product
+package application
+
+import (
+	"ecommerce/internal/product/domain"
+	"ecommerce/internal/product/dto"
+	"ecommerce/internal/product/infra"
+)
 
 type Service interface {
-	GetProducts() []Product
-	GetProductById(id string) (*Product, error)
-	DeleteProductById(id string) (*Product, error)
-	CreateProduct(p CreateProductRequest) error
-	UpdateProduct(p Product) (*Product, error)
+	GetProducts() []domain.Product
+	GetProductById(id string) (*domain.Product, error)
+	DeleteProductById(id string) (*domain.Product, error)
+	CreateProduct(p dto.CreateProductRequestDto) error
+	UpdateProduct(p domain.Product) (*domain.Product, error)
 }
 
 type productService struct {
-	repo Repository
+	repo infra.Repository
 }
 
 // CreateProduct implements Service.
-func (p *productService) CreateProduct(req CreateProductRequest) error {
-	base := ProductBase{
+func (p *productService) CreateProduct(req dto.CreateProductRequestDto) error {
+	base := domain.ProductBase{
 		ID:            req.ID,
 		IDType:        req.IDType,
 		CategoryId:    req.CategoryId,
@@ -23,7 +29,7 @@ func (p *productService) CreateProduct(req CreateProductRequest) error {
 		Manufacturer:  req.Manufacturer,
 		MFRPartNumber: req.MFRPartNumber,
 	}
-	product := Product{
+	product := domain.Product{
 		ProductBase:                   base,
 		Name:                          req.Name,
 		Slug:                          req.Slug,
@@ -50,25 +56,25 @@ func (p *productService) CreateProduct(req CreateProductRequest) error {
 }
 
 // UpdateProduct implements Service.
-func (p *productService) UpdateProduct(product Product) (*Product, error) {
+func (p *productService) UpdateProduct(product domain.Product) (*domain.Product, error) {
 	return p.repo.Update(product)
 }
 
 // DeleteProductById implements Service.
-func (p *productService) DeleteProductById(id string) (*Product, error) {
+func (p *productService) DeleteProductById(id string) (*domain.Product, error) {
 	return p.repo.DeleteOne(id)
 }
 
 // GetProductById implements Service.
-func (p *productService) GetProductById(id string) (*Product, error) {
+func (p *productService) GetProductById(id string) (*domain.Product, error) {
 	return p.repo.FindOne(id)
 }
 
 // GetProducts implements Service.
-func (p *productService) GetProducts() []Product {
+func (p *productService) GetProducts() []domain.Product {
 	return p.repo.Find()
 }
 
-func NewService(r Repository) Service {
+func NewService(r infra.Repository) Service {
 	return &productService{repo: r}
 }

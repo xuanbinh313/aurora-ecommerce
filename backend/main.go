@@ -2,7 +2,7 @@ package main
 
 import (
 	"ecommerce/config"
-	"ecommerce/routes"
+	"ecommerce/internal/product/adapter"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,6 +10,6 @@ import (
 func main() {
 	config.LoadEnv()
 	r := gin.Default()
-	routes.RegisterRouter(r)
+	adapter.RegisterRouter(r)
 	r.Run(":8080")
 }

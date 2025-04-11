@@ -1,15 +1,16 @@
-package product
+package infra
 
 import (
+	"ecommerce/internal/product/domain"
 	"encoding/json"
 	"errors"
 )
 
-var sampleProducts = []Product{
+var sampleProducts = []domain.Product{
 	{
-		ProductBase: ProductBase{
+		ProductBase: domain.ProductBase{
 			ID:            "1",
-			IDType:        IDTypeUPC,
+			IDType:        domain.IDTypeUPC,
 			CategoryId:    "cat1",
 			Title:         "Sample Product 1",
 			Brand:         "Brand A",
@@ -21,9 +22,9 @@ var sampleProducts = []Product{
 		Slug:         "sample-product-1",
 		Description:  "This is a sample product 1",
 		Images:       []string{"image1.jpg", "image2.jpg"},
-		Width:        Unit{UnitType: IDInches, Value: 10},
-		Height:       Unit{UnitType: IDInches, Value: 20},
-		Length:       Unit{UnitType: IDInches, Value: 30},
+		Width:        domain.Unit{UnitType: domain.IDInches, Value: 10},
+		Height:       domain.Unit{UnitType: domain.IDInches, Value: 20},
+		Length:       domain.Unit{UnitType: domain.IDInches, Value: 30},
 		Price:        100.0,
 		SalePrice:    90.0,
 		Stock:        50,
@@ -34,9 +35,9 @@ var sampleProducts = []Product{
 		}(),
 	},
 	{
-		ProductBase: ProductBase{
+		ProductBase: domain.ProductBase{
 			ID:            "2",
-			IDType:        IDTypeEAN,
+			IDType:        domain.IDTypeEAN,
 			CategoryId:    "cat2",
 			Title:         "Sample Product 2",
 			Brand:         "Brand B",
@@ -48,9 +49,9 @@ var sampleProducts = []Product{
 		Slug:         "sample-product-2",
 		Description:  "This is a sample product 2",
 		Images:       []string{"image3.jpg", "image4.jpg"},
-		Width:        Unit{UnitType: IDFeet, Value: 5},
-		Height:       Unit{UnitType: IDFeet, Value: 10},
-		Length:       Unit{UnitType: IDFeet, Value: 15},
+		Width:        domain.Unit{UnitType: domain.IDFeet, Value: 5},
+		Height:       domain.Unit{UnitType: domain.IDFeet, Value: 10},
+		Length:       domain.Unit{UnitType: domain.IDFeet, Value: 15},
 		Price:        200.0,
 		SalePrice:    180.0,
 		Stock:        30,
@@ -63,11 +64,11 @@ var sampleProducts = []Product{
 }
 
 type Repository interface {
-	Create(base ProductBase, product Product) error
-	Update(p Product) (*Product, error)
-	Find() []Product
-	FindOne(id string) (*Product, error)
-	DeleteOne(id string) (*Product, error)
+	Create(base domain.ProductBase, product domain.Product) error
+	Update(p domain.Product) (*domain.Product, error)
+	Find() []domain.Product
+	FindOne(id string) (*domain.Product, error)
+	DeleteOne(id string) (*domain.Product, error)
 }
 
 func NewMemoryRepository() Repository {
@@ -75,14 +76,14 @@ func NewMemoryRepository() Repository {
 }
 
 type memoryRepository struct {
-	products []Product
+	products []domain.Product
 }
 
-func (r *memoryRepository) Find() []Product {
+func (r *memoryRepository) Find() []domain.Product {
 	return r.products
 }
 
-func (r *memoryRepository) Create(b ProductBase, p Product) error {
+func (r *memoryRepository) Create(b domain.ProductBase, p domain.Product) error {
 	for _, product := range r.products {
 		if p.ID == product.ID {
 			return errors.New("product already exists")
@@ -93,32 +94,32 @@ func (r *memoryRepository) Create(b ProductBase, p Product) error {
 }
 
 // Update implements Repository.
-func (r *memoryRepository) Update(p Product) (*Product, error) {
+func (r *memoryRepository) Update(p domain.Product) (*domain.Product, error) {
 	for index, product := range r.products {
 		if p.ID == product.ID {
 			r.products[index] = p
 			return &p, nil
 		}
 	}
-	return nil, errors.New("Product not found")
+	return nil, errors.New("product not found")
 }
 
-func (r *memoryRepository) FindOne(id string) (*Product, error) {
+func (r *memoryRepository) FindOne(id string) (*domain.Product, error) {
 	for _, product := range r.products {
 		if product.ID == id {
 			return &product, nil
 		}
 	}
-	return nil, errors.New("Product not found")
+	return nil, errors.New("product not found")
 }
 
 // DeleteOne implements Repository.
-func (r *memoryRepository) DeleteOne(id string) (*Product, error) {
+func (r *memoryRepository) DeleteOne(id string) (*domain.Product, error) {
 	for index, product := range r.products {
 		if product.ID == id {
 			r.products = append(r.products[:index], r.products[index+1:]...)
 			return &product, nil
 		}
 	}
-	return nil, errors.New("Product not found")
+	return nil, errors.New("product not found")
 }

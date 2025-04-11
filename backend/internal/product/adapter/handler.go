@@ -1,6 +1,9 @@
-package product
+package adapter
 
 import (
+	"ecommerce/internal/product/application"
+	"ecommerce/internal/product/domain"
+	"ecommerce/internal/product/dto"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +14,7 @@ type IDUri struct {
 }
 
 type Handler struct {
-	service Service
+	service application.Service
 }
 
 func (h *Handler) GetProducts(c *gin.Context) {
@@ -33,7 +36,7 @@ func (h *Handler) GetProductById(c *gin.Context) {
 }
 
 func (h *Handler) CreateProduct(c *gin.Context) {
-	var requestNewProduct CreateProductRequest
+	var requestNewProduct dto.CreateProductRequestDto
 	if err := c.ShouldBindJSON(&requestNewProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -46,7 +49,7 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 }
 
 func (h *Handler) UpdateProduct(c *gin.Context) {
-	var body Product
+	var body domain.Product
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -71,7 +74,7 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, http.NoBody)
 }
-func NewHandler(s Service) *Handler {
+func NewHandler(s application.Service) *Handler {
 	return &Handler{service: s}
 }
 
