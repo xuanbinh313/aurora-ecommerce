@@ -33,7 +33,7 @@ func (h *Handler) GetProductById(c *gin.Context) {
 }
 
 func (h *Handler) CreateProduct(c *gin.Context) {
-	var requestNewProduct Product
+	var requestNewProduct CreateProductRequest
 	if err := c.ShouldBindJSON(&requestNewProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -63,7 +63,7 @@ var sampleProducts = []Product{
 }
 
 type Repository interface {
-	Create(p Product) error
+	Create(base ProductBase, product Product) error
 	Update(p Product) (*Product, error)
 	Find() []Product
 	FindOne(id string) (*Product, error)
@@ -82,7 +82,7 @@ func (r *memoryRepository) Find() []Product {
 	return r.products
 }
 
-func (r *memoryRepository) Create(p Product) error {
+func (r *memoryRepository) Create(b ProductBase, p Product) error {
 	for _, product := range r.products {
 		if p.ID == product.ID {
 			return errors.New("product already exists")
