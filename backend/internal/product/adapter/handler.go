@@ -29,7 +29,7 @@ func (h *Handler) GetProductById(c *gin.Context) {
 	}
 	product, err := h.service.GetProductById(uri.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, product)
@@ -42,7 +42,7 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		return
 	}
 	if err := h.service.CreateProduct(requestNewProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, http.NoBody)
@@ -56,7 +56,7 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 	}
 	product, err := h.service.UpdateProduct(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, product)
@@ -69,7 +69,7 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 	}
 	_, err := h.service.DeleteProductById(uri.ID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, http.NoBody)

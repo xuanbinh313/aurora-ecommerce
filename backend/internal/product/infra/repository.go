@@ -3,7 +3,6 @@ package infra
 import (
 	"ecommerce/internal/product/domain"
 	"encoding/json"
-	"errors"
 )
 
 var sampleProducts = []domain.Product{
@@ -86,7 +85,7 @@ func (r *memoryRepository) Find() []domain.Product {
 func (r *memoryRepository) Create(b domain.ProductBase, p domain.Product) error {
 	for _, product := range r.products {
 		if p.ID == product.ID {
-			return errors.New("product already exists")
+			return domain.ErrNotFound
 		}
 	}
 	r.products = append(r.products, p)
@@ -101,7 +100,7 @@ func (r *memoryRepository) Update(p domain.Product) (*domain.Product, error) {
 			return &p, nil
 		}
 	}
-	return nil, errors.New("product not found")
+	return nil, domain.ErrNotFound
 }
 
 func (r *memoryRepository) FindOne(id string) (*domain.Product, error) {
@@ -110,7 +109,7 @@ func (r *memoryRepository) FindOne(id string) (*domain.Product, error) {
 			return &product, nil
 		}
 	}
-	return nil, errors.New("product not found")
+	return nil, domain.ErrNotFound
 }
 
 // DeleteOne implements Repository.
@@ -121,5 +120,5 @@ func (r *memoryRepository) DeleteOne(id string) (*domain.Product, error) {
 			return &product, nil
 		}
 	}
-	return nil, errors.New("product not found")
+	return nil, domain.ErrNotFound
 }
