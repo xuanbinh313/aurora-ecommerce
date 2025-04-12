@@ -26,7 +26,7 @@ type CreateProductRequestDto struct {
 	Tags                          []domain.Tag              `json:"tags"`
 	Price                         float64                   `json:"price" `
 	SalePrice                     float64                   `json:"salePrice" `
-	HasTax                        bool                      `json:"hasTax" binding:"default=false"`
+	HasTax                        bool                      `json:"hasTax"`
 	Tax                           float64                   `json:"tax" `
 	Stock                         int                       `json:"stock" `
 	TrackQuantity                 bool                      `json:"trackQuantity"`

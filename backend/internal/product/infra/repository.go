@@ -3,6 +3,8 @@ package infra
 import (
 	"ecommerce/internal/product/domain"
 	"encoding/json"
+
+	"gorm.io/gorm"
 )
 
 var sampleProducts = []domain.Product{
@@ -70,7 +72,7 @@ type Repository interface {
 	DeleteOne(id string) (*domain.Product, error)
 }
 
-func NewMemoryRepository() Repository {
+func NewMemoryRepository(db *gorm.DB) Repository {
 	return &memoryRepository{products: sampleProducts}
 }
 
