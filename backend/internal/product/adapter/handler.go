@@ -38,6 +38,10 @@ func (h *Handler) GetProductById(c *gin.Context) {
 func (h *Handler) CreateProduct(c *gin.Context) {
 	var requestNewProduct dto.CreateProductRequestDto
 	if err := c.ShouldBindJSON(&requestNewProduct); err != nil {
+		if validationErrs := domain.ParseValidationErrors(err, requestNewProduct); validationErrs != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"errors": validationErrs})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
