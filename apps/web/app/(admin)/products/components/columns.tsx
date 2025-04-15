@@ -35,31 +35,35 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
+      <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("name")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "category.name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="Category" />
     ),
-    cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
+    // cell: ({ row }) => (
+    //   <div className="w-[80px]">{row.getValue("category")}</div>
+    // ),
 
-      return (
-        <div className="flex space-x-2">
-          {label && <Badge variant="outline">{label.label}</Badge>}
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("title")}
-          </span>
-        </div>
-      );
-    },
+    // cell: ({ row }) => {
+    //   const label = labels.find((label) => label.value === row.original.label);
+
+    //   return (
+    //     <div className="flex space-x-2">
+    //       {label && <Badge variant="outline">{label.label}</Badge>}
+    //       <span className="max-w-[500px] truncate font-medium">
+    //         {row.getValue("title")}
+    //       </span>
+    //     </div>
+    //   );
+    // },
   },
   {
     accessorKey: "status",
