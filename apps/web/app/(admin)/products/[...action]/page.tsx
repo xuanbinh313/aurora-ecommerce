@@ -7,15 +7,32 @@ import {
 } from "@/components/ui/accordion";
 import { VitalInfoForm } from "./vital-info-form";
 import { NameDescriptionForm } from "./name-description-form";
+import { notFound } from "next/navigation";
 
-export default function SettingsProfilePage() {
+export default async function SettingsProfilePage({
+  params,
+}: {
+  params: Promise<{ action: string[] }>;
+}) {
+  const { action } = await params;
+  if (action.length === 2 && action[1] === "edit") {
+    console.log("edit action");
+  } else if (action.length === 1 && action[0] === "new") {
+    console.log("create action");
+  } else if (action.length === 1 && action[0] !== "new") {
+    console.log("view action");
+  } else {
+    return notFound();
+  }
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Product</h3>
-        <p className="text-sm text-muted-foreground">
-          This is how others will see you on the site.
-        </p>
+    <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="flex items-center justify-between space-y-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Product Details</h2>
+          <p className="text-muted-foreground">
+            Here&apos;s a list of your tasks for this month!
+          </p>
+        </div>
       </div>
       <Separator />
       <Accordion type="single" collapsible className="w-full">
