@@ -1,6 +1,7 @@
-package adapter
+package product
 
 import (
+	"ecommerce/internal/common"
 	"ecommerce/internal/product/application"
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
@@ -35,7 +36,7 @@ func (h *Handler) GetProductById(c *gin.Context) {
 	}
 	product, err := h.service.GetProductById(uint(id))
 	if err != nil {
-		RespondWithError(c, err)
+		common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, product)
@@ -52,7 +53,7 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		return
 	}
 	if err := h.service.CreateProduct(requestNewProduct); err != nil {
-		RespondWithError(c, err)
+		common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, http.NoBody)
@@ -66,7 +67,7 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 	}
 	product, err := h.service.UpdateProduct(body)
 	if err != nil {
-		RespondWithError(c, err)
+		common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, product)
@@ -84,7 +85,7 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 	}
 
 	if _, err := h.service.DeleteProductById(uint(id)); err != nil {
-		RespondWithError(c, err)
+		common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, http.NoBody)
@@ -93,7 +94,7 @@ func NewHandler(s application.Service) *Handler {
 	return &Handler{service: s}
 }
 
-func (h *Handler) RegisterRouter(r *gin.Engine) {
+func (h *Handler) RegisterRouter(r *gin.RouterGroup) {
 	productGroup := r.Group("/products")
 	{
 		productGroup.GET("/", h.GetProducts)
