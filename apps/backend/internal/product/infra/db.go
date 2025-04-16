@@ -17,6 +17,7 @@ func ConnectDB() *gorm.DB {
 		os.Getenv("DB_NAME"),
 		os.Getenv("DB_PORT"),
 	)
+	fmt.Println("Connecting to database with DSN:", dsn)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	// db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {

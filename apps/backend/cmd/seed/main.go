@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ecommerce/config"
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/infra"
 	"encoding/csv"
@@ -12,8 +13,12 @@ import (
 )
 
 func main() {
+	config.LoadEnv()
+	dir, _ := os.Getwd()
+	fmt.Println("Current working dir:", dir)
 	db := infra.ConnectDB()
-	file, err := os.Open("data.csv")
+	db.AutoMigrate(&domain.Category{})
+	file, err := os.Open(dir + "/cmd/seed/data.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -25,12 +30,12 @@ func main() {
 		panic(err)
 	}
 
-	for _, row := range rows {
-		if len(row) < 2 {
+	for i, row := range rows {
+		if i == 0 {
 			continue
 		}
-		parentName := strings.TrimSpace(row[0])
-		childName := strings.TrimSpace(row[1])
+		parentName := strings.TrimSpace(row[3])
+		childName := strings.TrimSpace(row[4])
 
 		// Insert parent if not exists
 		parent, err := getOrCreateCategory(db, parentName, nil)
@@ -52,7 +57,13 @@ func main() {
 func getOrCreateCategory(db *gorm.DB, name string, parentID *uint) (*domain.Category, error) {
 	var category domain.Category
 	// Check if already exists
-	err := db.Where("name = ? AND parent_id = ?", name, parentID).First(&category).Error
+	query := db.Where("name = ?", name)
+	if parentID == nil {
+		query = query.Where("parent_id IS NULL")
+	} else {
+		query = query.Where("parent_id = ?", parentID)
+	}
+	err := query.First(&category).Error
 	if err == nil {
 		return &category, nil
 	}
