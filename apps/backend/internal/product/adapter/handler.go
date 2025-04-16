@@ -5,6 +5,7 @@ import (
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +28,12 @@ func (h *Handler) GetProductById(c *gin.Context) {
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
 	}
-	product, err := h.service.GetProductById(uri.ID)
+	id, err := strconv.ParseUint(uri.ID, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+	product, err := h.service.GetProductById(uint(id))
 	if err != nil {
 		RespondWithError(c, err)
 		return
@@ -71,8 +77,13 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
 	}
-	_, err := h.service.DeleteProductById(uri.ID)
+	id, err := strconv.ParseUint(uri.ID, 10, 32)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	if _, err := h.service.DeleteProductById(uint(id)); err != nil {
 		RespondWithError(c, err)
 		return
 	}
