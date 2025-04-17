@@ -1,24 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { cn } from "@/lib/utils";
 
-import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -27,21 +23,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 const productFormSchema = z.object({
-  id: z.string({
-    required_error: "Please select a id to display.",
-  }),
-  idType: z.string({
-    required_error: "Please select an email to display.",
-  }),
   categoryId: z.string(),
-  title: z.string({ required_error: "Title is required." }),
+  name: z.string({ required_error: "Name is required." }),
   brand: z.string(),
-  manufacturer: z.string(),
-  mfrPartNumber: z.string(),
-  name: z.string(),
-  slug: z.string(),
   description: z.string(),
   images: z
     .array(
@@ -50,16 +37,13 @@ const productFormSchema = z.object({
       })
     )
     .optional(),
-  width: z.number(),
-  height: z.number(),
-  length: z.number(),
   productAttributes: z.number(),
   variants: z.number(),
-  tags: z.array(
-    z.object({
-      value: z.string().url({ message: "Please enter a valid URL." }),
-    })
-  ),
+  // tags: z.array(
+  //   z.object({
+  //     value: z.string().url({ message: "Please enter a valid URL." }),
+  //   })
+  // ),
   price: z.number(),
   salePrice: z.number(),
   hasTax: z.boolean(),
@@ -74,25 +58,24 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 
 // This can come from your database or API.
 const defaultValues: Partial<ProductFormValues> = {
-  id: "",
   name: "I own a computer.",
-  tags: [
-    { value: "https://shadcn.com" },
-    { value: "http://twitter.com/shadcn" },
-  ],
+  // tags: [
+  //   { value: "https://shadcn.com" },
+  //   { value: "http://twitter.com/shadcn" },
+  // ],
 };
 
-export function VitalInfoForm() {
+export function ProductForm() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  const { fields, append } = useFieldArray({
-    name: "tags",
-    control: form.control,
-  });
+  // const { fields, append } = useFieldArray({
+  //   name: "tags",
+  //   control: form.control,
+  // });
 
   function onSubmit(data: ProductFormValues) {
     toast({
@@ -108,58 +91,51 @@ export function VitalInfoForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ID</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="categoryId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="grid grid-cols-2 gap-2">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
+                  <Input placeholder="shadcn" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="living_room">Living Room</SelectItem>
-                  <SelectItem value="bed_room">Bed Room</SelectItem>
-                  <SelectItem value="kitchen">Kitchen</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl className="w-full">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="living_room">Living Room</SelectItem>
+                    <SelectItem value="bed_room">Bed Room</SelectItem>
+                    <SelectItem value="kitchen">Kitchen</SelectItem>
+                  </SelectContent>
+                </Select>
+                {/* <FormDescription>
+                  You can manage verified email addresses in your{" "}
+                  <Link href="/examples/forms">email settings</Link>.
+                </FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="brand"
@@ -173,7 +149,36 @@ export function VitalInfoForm() {
             </FormItem>
           )}
         />
-        <FormField
+        <div className="grid grid-cols-2 gap-2">
+          <FormField
+            control={form.control}
+            name="stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Stock</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* <FormField
           control={form.control}
           name="manufacturer"
           render={({ field }) => (
@@ -185,20 +190,8 @@ export function VitalInfoForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="mfrPartNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>MFRPartNumber</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        />*/}
+
         <FormField
           control={form.control}
           name="description"
@@ -216,7 +209,7 @@ export function VitalInfoForm() {
             </FormItem>
           )}
         />
-        <div>
+        {/* <div>
           {fields.map((field, index) => (
             <FormField
               control={form.control}
@@ -247,7 +240,7 @@ export function VitalInfoForm() {
           >
             Add URL
           </Button>
-        </div>
+        </div> */}
         <Button type="submit">Save</Button>
       </form>
     </Form>
