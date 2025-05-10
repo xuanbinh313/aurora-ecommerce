@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"ecommerce/internal/category/domain"
-
 	"gorm.io/gorm"
 )
 
@@ -14,9 +12,9 @@ type Product struct {
 	ShortDescription  string
 	Description       string
 	CategoryID        string
-	Category          domain.Category
+	Category          Category
 	ProductAttributes []ProductAttribute
-	Variants          []domain.Variant `gorm:"foreignKey:ProductID"`
+	Variants          []Variant `gorm:"foreignKey:ProductID"`
 	Images            []string
 	RegularPrice      float64
 	Price             float64

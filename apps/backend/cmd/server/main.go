@@ -2,14 +2,19 @@ package main
 
 import (
 	"ecommerce/config"
-	"ecommerce/internal/product/adapter"
+	categoryAdapter "ecommerce/internal/category/adapter"
+	"ecommerce/internal/db"
+	productAdapter "ecommerce/internal/product/adapter"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	config.LoadEnv()
+	db := db.GetDB()
 	r := gin.Default()
-	adapter.RegisterRouter(r)
+	api := r.Group("/api")
+	productAdapter.RegisterRouter(api, db)
+	categoryAdapter.RegisterRouter(api, db)
 	r.Run(":8080")
 }

@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"ecommerce/internal/product/domain"
+	"ecommerce/internal/category/domain"
 )
 
 type CreateProductRequestDto struct {

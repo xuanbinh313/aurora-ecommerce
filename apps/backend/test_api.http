@@ -1,0 +1,61 @@
+### Create Category
+POST http://localhost:8080/categories
+Content-Type: application/json
+
+{
+  "name": "Electronics",
+  "slug": "electronics",
+  "description": "Electronic products and gadgets"
+}
+
+### Get All Categories
+GET http://localhost:8080/categories
+
+### Get Category by ID
+GET http://localhost:8080/categories/1
+
+### Update Category
+PUT http://localhost:8080/categories/1
+Content-Type: application/json
+
+{
+  "name": "Updated Electronics",
+  "description": "Updated description for electronics"
+}
+
+### Delete Category
+DELETE http://localhost:8080/categories/1
+
+
+### Create Product
+POST http://localhost:8080/products
+Content-Type: application/json
+
+{
+  "name": "Smartphone",
+  "slug": "smartphone",
+  "description": "High-end smartphone",
+  "price": 999.99,
+  "sale_price": 899.99,
+  "stock": 10,
+  "image": "https://example.com/smartphone.jpg",
+  "category_id": 1
+}
+
+### Get All Products
+GET http://localhost:8080/products
+
+### Get Product by ID
+GET http://localhost:8080/products/1
+
+### Update Product
+PUT http://localhost:8080/products/1
+Content-Type: application/json
+
+{
+  "name": "Updated Smartphone",
+  "price": 949.99
+}
+
+### Delete Product
+DELETE http://localhost:8080/products/1

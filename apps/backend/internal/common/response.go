@@ -1,7 +1,7 @@
 package common
 
 import (
-	"ecommerce/internal/product/domain"
+	domain "ecommerce/internal/error"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

@@ -2,8 +2,8 @@ package main
 
 import (
 	"ecommerce/config"
-	"ecommerce/internal/product/domain"
-	"ecommerce/internal/product/infra"
+	"ecommerce/internal/category/domain"
+	"ecommerce/internal/db"
 	"encoding/csv"
 	"fmt"
 	"os"
@@ -16,7 +16,7 @@ func main() {
 	config.LoadEnv()
 	dir, _ := os.Getwd()
 	fmt.Println("Current working dir:", dir)
-	db := infra.ConnectDB()
+	db := db.GetDB()
 	db.AutoMigrate(&domain.Category{})
 	file, err := os.Open(dir + "/cmd/seed/data.csv")
 	if err != nil {

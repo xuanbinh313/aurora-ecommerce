@@ -20,7 +20,7 @@ type Handler struct {
 }
 
 func (h *Handler) GetProducts(c *gin.Context) {
-	products := h.service.GetProducts()
+	products, _ := h.service.GetProducts(c.Request.Context())
 	c.JSON(http.StatusOK, products)
 }
 
@@ -34,7 +34,7 @@ func (h *Handler) GetProductById(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
 		return
 	}
-	product, err := h.service.GetProductById(uint(id))
+	product, err := h.service.GetProductById(c.Request.Context(), uint(id))
 	if err != nil {
 		common.RespondWithError(c, err)
 		return
@@ -52,7 +52,7 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := h.service.CreateProduct(requestNewProduct); err != nil {
+	if err := h.service.CreateProduct(c.Request.Context(), requestNewProduct); err != nil {
 		common.RespondWithError(c, err)
 		return
 	}
@@ -60,12 +60,21 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 }
 
 func (h *Handler) UpdateProduct(c *gin.Context) {
+	var uri IDUri
+	if err := c.ShouldBindUri(&uri); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID is required"})
+	}
+	id, err := strconv.ParseUint(uri.ID, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
 	var body domain.Product
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	product, err := h.service.UpdateProduct(body)
+	product, err := h.service.UpdateProduct(c.Request.Context(), uint(id), body)
 	if err != nil {
 		common.RespondWithError(c, err)
 		return
@@ -84,14 +93,14 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 		return
 	}
 
-	if _, err := h.service.DeleteProductById(uint(id)); err != nil {
+	if _, err := h.service.DeleteProductById(c.Request.Context(), uint(id)); err != nil {
 		common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, http.NoBody)
 }
-func NewHandler(s application.Service) *Handler {
-	return &Handler{service: s}
+func NewHandler(service application.Service) *Handler {
+	return &Handler{service: service}
 }
 
 func (h *Handler) RegisterRouter(r *gin.RouterGroup) {
