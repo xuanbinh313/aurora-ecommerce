@@ -5,25 +5,12 @@ import (
 )
 
 type CreateProductRequestDto struct {
-	CategoryId        string                    `json:"categoryId" binding:"required"`
-	Title             string                    `json:"title" binding:"required"`
-	Brand             string                    `json:"brand" binding:"required"`
-	Manufacturer      string                    `json:"manufacturer" binding:"required"`
-	MFRPartNumber     string                    `json:"mfrPartNumber" binding:"required"`
-	Name              string                    `json:"name" binding:"required"`
-	Slug              string                    `json:"slug"`
-	Description       string                    `json:"description"`
-	Images            []string                  `json:"images" binding:"required,dive,required"`
-	ProductAttributes []domain.ProductAttribute `json:"productAttributes"`
-	Variants          []domain.Variant          `json:"variants"`
-	Price             float64                   `json:"price" `
-	SalePrice         float64                   `json:"salePrice" `
-	HasTax            bool                      `json:"hasTax"`
-	Tax               float64                   `json:"tax" `
-	Stock             int                       `json:"stock" `
-	// ShippingType                  string                    `json:"shippingType" binding:"required"`
-	// ShippingRaw                   json.RawMessage           `json:"shipping" binding:"required"`
-	// ShippingInfo                  domain.ShippingInfo       `json:"-"`
+	Name             string         `json:"name" binding:"required"`
+	Slug             string         `json:"slug"`
+	Description      string         `json:"description"`
+	ShortDescription string         `json:"shortDescription"`
+	Images           []domain.Image `json:"images" binding:"required,dive,required"`
+	RegularPrice     float64        `json:"regularPrice"`
 }
 
 type ProductResponse struct {

@@ -31,16 +31,6 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 		Slug:        req.Slug,
 		Description: req.Description,
 		Images:      req.Images,
-		// ProductAttributes: req.ProductAttributes,
-		Variants:  req.Variants,
-		Price:     req.Price,
-		SalePrice: req.SalePrice,
-		HasTax:    req.HasTax,
-		Tax:       req.Tax,
-		Stock:     req.Stock,
-		// ShippingType:                  req.ShippingType,
-		// ShippingRaw:                   req.ShippingRaw,
-		// ShippingInfo:                  req.ShippingInfo,
 	}
 	return p.repo.Create(&product)
 }
@@ -57,14 +47,6 @@ func (p *productService) UpdateProduct(ctx context.Context, id uint, updatedProd
 	existingProduct.Slug = updatedProduct.Slug
 	existingProduct.Description = updatedProduct.Description
 	existingProduct.Images = updatedProduct.Images
-	existingProduct.ProductAttributes = updatedProduct.ProductAttributes
-	existingProduct.Variants = updatedProduct.Variants
-	existingProduct.Price = updatedProduct.Price
-	existingProduct.SalePrice = updatedProduct.SalePrice
-	existingProduct.HasTax = updatedProduct.HasTax
-	existingProduct.Tax = updatedProduct.Tax
-	existingProduct.Stock = updatedProduct.Stock
-	// Add other fields as needed
 
 	err = p.repo.Update(existingProduct)
 	if err != nil {

@@ -8,32 +8,24 @@ import (
 
 type Product struct {
 	gorm.Model
-	Name              string
-	Type              string
-	Slug              string `gorm:"unique"`
-	ShortDescription  string
-	Description       string
-	CategoryID        string
-	Category          domain.Category
-	ProductAttributes []ProductAttribute
-	Variants          []domain.Variant `gorm:"foreignKey:ProductID"`
-	Images            []string
-	RegularPrice      float64
-	Price             float64
-	SalePrice         float64
-	HasTax            bool
-	Tax               float64
-	BrandID           uint
-	Brand             Brand
-	Stock             int
-	// ShippingType      string
-	// ShippingRaw       json.RawMessage
-	// ShippingInfo      ShippingInfo
+	Name             string
+	Type             string
+	Slug             string `gorm:"unique"`
+	ShortDescription string
+	Description      string
+	Status           string
+	CategoryID       string
+	Category         domain.Category
+	Images           []domain.Image
+	RegularPrice     float64
+	Links            LinkProduct
 }
 
-type ProductAttribute struct {
-	gorm.Model
-	Name        string
-	Description string
-	CategoryID  string
+type Link struct {
+	Href string
+}
+
+type LinkProduct struct {
+	Self       []Link
+	Collection []Link
 }

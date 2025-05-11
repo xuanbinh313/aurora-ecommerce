@@ -17,6 +17,11 @@ func (r *BaseRepository[T]) Create(entity *T) error {
 	return r.db.Create(entity).Error
 }
 
+// CreateMany creates multiple entities
+func (r *BaseRepository[T]) CreateMany(entities []T) error {
+	return r.db.Create(&entities).Error
+}
+
 // FindAll finds all entities
 func (r *BaseRepository[T]) Find() ([]T, error) {
 	var entities []T
