@@ -16,9 +16,8 @@ type Product struct {
 	Status           string
 	CategoryID       string
 	Category         domain.Category
-	Images           []domain.Image
+	Images           []domain.Image `gorm:"many2many:product_images;"`
 	RegularPrice     float64
-	Links            LinkProduct
 }
 
 type Link struct {

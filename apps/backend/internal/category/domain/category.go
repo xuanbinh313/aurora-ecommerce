@@ -24,38 +24,38 @@ type Image struct {
 	gorm.Model
 	Src  string `json:"src"`
 	Name string `json:"name"`
-	Alt  string `json:"alt"`
+	Alt  string `json:"alt,omitempty"`
 }
 
-type Attribute struct {
-	gorm.Model
-	Name string // eg: "Color", "Size", "Storage"
-}
+// type Attribute struct {
+// 	gorm.Model
+// 	Name string // eg: "Color", "Size", "Storage"
+// }
 
-type CategoryAttribute struct {
-	ID          string
-	CategoryID  string
-	AttributeID string
-	Attribute   Attribute `gorm:"foreignKey:AttributeID"`
-}
+// type CategoryAttribute struct {
+// 	ID          string
+// 	CategoryID  string
+// 	AttributeID string
+// 	Attribute   Attribute `gorm:"foreignKey:AttributeID"`
+// }
 
-type Variant struct {
-	gorm.Model
-	ProductID  string
-	SKU        string
-	Price      float64
-	SalePrice  float64
-	HasTax     bool
-	Tax        float64
-	Stock      int
-	Image      string
-	Attributes []VariantAttribute `gorm:"foreignKey:VariantID"`
-}
+// type Variant struct {
+// 	gorm.Model
+// 	ProductID  string
+// 	SKU        string
+// 	Price      float64
+// 	SalePrice  float64
+// 	HasTax     bool
+// 	Tax        float64
+// 	Stock      int
+// 	Image      string
+// 	Attributes []VariantAttribute `gorm:"foreignKey:VariantID"`
+// }
 
-type VariantAttribute struct {
-	ID          string
-	VariantID   string
-	AttributeID string
-	Attribute   Attribute `gorm:"foreignKey:AttributeID"`
-	Value       string    // Eg: "Red", "128GB"
-}
+// type VariantAttribute struct {
+// 	ID          string
+// 	VariantID   string
+// 	AttributeID string
+// 	Attribute   Attribute `gorm:"foreignKey:AttributeID"`
+// 	Value       string    // Eg: "Red", "128GB"
+// }
