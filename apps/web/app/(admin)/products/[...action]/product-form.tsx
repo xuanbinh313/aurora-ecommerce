@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,7 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,9 +23,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import TabsCategory from "../components/tabs-category";
 
-const productFormSchema = z.object({
-  categoryId: z.string(),
+export const ProductFormSchema = z.object({
+  categories: z
+    .array(z.string())
+    .refine((value) => value.some((item) => item), {
+      message: "You have to select at least one item.",
+    }),
   name: z.string({ required_error: "Name is required." }),
   brand: z.string(),
   description: z.string(),
@@ -54,7 +58,7 @@ const productFormSchema = z.object({
   shippingType: z.string(),
 });
 
-type ProductFormValues = z.infer<typeof productFormSchema>;
+type ProductFormValues = z.infer<typeof ProductFormSchema>;
 
 // This can come from your database or API.
 const defaultValues: Partial<ProductFormValues> = {
@@ -67,7 +71,7 @@ const defaultValues: Partial<ProductFormValues> = {
 
 export function ProductForm() {
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema),
+    resolver: zodResolver(ProductFormSchema),
     defaultValues,
     mode: "onChange",
   });
@@ -91,94 +95,66 @@ export function ProductForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-2 gap-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl className="w-full">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="living_room">Living Room</SelectItem>
-                    <SelectItem value="bed_room">Bed Room</SelectItem>
-                    <SelectItem value="kitchen">Kitchen</SelectItem>
-                  </SelectContent>
-                </Select>
-                {/* <FormDescription>
-                  You can manage verified email addresses in your{" "}
-                  <Link href="/examples/forms">email settings</Link>.
-                </FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="col-span-2 ">
+            <div className="flex flex-col gap-3">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <FormField
-          control={form.control}
-          name="brand"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Brand</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-2">
-          <FormField
-            control={form.control}
-            name="stock"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Stock</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <Input placeholder="shadcn" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+              <FormField
+                control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Brand</FormLabel>
+                    <FormControl>
+                      <Input placeholder="shadcn" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={form.control}
+                  name="stock"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stock</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="shadcn" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input placeholder="shadcn" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-        {/* <FormField
+              {/* <FormField
           control={form.control}
           name="manufacturer"
           render={({ field }) => (
@@ -192,24 +168,24 @@ export function ProductForm() {
           )}
         />*/}
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us a little bit about yourself"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* <div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Tell us a little bit about yourself"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* <div>
           {fields.map((field, index) => (
             <FormField
               control={form.control}
@@ -241,7 +217,11 @@ export function ProductForm() {
             Add URL
           </Button>
         </div> */}
-        <Button type="submit">Save</Button>
+              <Button type="submit">Save</Button>
+            </div>
+          </div>
+          <TabsCategory />
+        </div>
       </form>
     </Form>
   );
