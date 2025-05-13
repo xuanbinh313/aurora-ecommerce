@@ -10,10 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusIcon } from "lucide-react";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 
 // import { toast } from "@/components/hooks/use-toast";
@@ -22,51 +20,44 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import Link from "next/link";
+import { cx } from "class-variance-authority";
 import { ProductFormSchema } from "../[...action]/product-form";
-import { useState } from "react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import FormCategory from "./form-category";
 const items = [
   {
     id: "recents",
     label: "Recents",
+    parent: null,
   },
   {
     id: "home",
     label: "Home",
+    parent: "recents",
   },
   {
     id: "applications",
     label: "Applications",
+    parent: "recents",
   },
   {
     id: "desktop",
     label: "Desktop",
+    parent: "recents",
   },
   {
     id: "downloads",
     label: "Downloads",
+    parent: null,
   },
   {
     id: "documents",
     label: "Documents",
+    parent: "recents",
   },
 ] as const;
 
@@ -81,7 +72,6 @@ const FormSchema = z.object({
 
 const CategoryContent = () => {
   const formProduct = useFormContext<z.infer<typeof ProductFormSchema>>();
-  const form = useForm<z.infer<typeof FormSchema>>();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     // toast({
@@ -94,100 +84,58 @@ const CategoryContent = () => {
     // });
   }
   return (
-    <Card>
-      <CardContent className="space-y-2">
-        <Form {...formProduct}>
-          <form
-            onSubmit={formProduct.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
-            <FormField
-              control={formProduct.control}
-              name="categories"
-              render={() => (
-                <FormItem>
-                  {items.map((item) => (
-                    <FormField
-                      key={item.id}
-                      control={formProduct.control}
-                      name="categories"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== item.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  ))}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-        <Collapsible>
-          <CollapsibleTrigger>
-            <Button type="button" variant="link">
-              <PlusIcon />
-              Add new category
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <>
-              <div className="space-y-1">
-                <Input id="name" defaultValue="Pedro Duarte" />
-              </div>
-              <FormField
-                control={form.control}
-                name="parentId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl className="w-full">
-                        <SelectTrigger>
-                          <SelectValue placeholder="-- Parent category --" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="living_room">Living Room</SelectItem>
-                        <SelectItem value="bed_room">Bed Room</SelectItem>
-                        <SelectItem value="kitchen">Kitchen</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="button">Add New Category</Button>
-            </>
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-    </Card>
+    <>
+      <Card>
+        <CardContent className="space-y-2">
+          <FormField
+            control={formProduct.control}
+            name="categories"
+            render={() => (
+              <FormItem>
+                {items.map((item) => (
+                  <FormField
+                    key={item.id}
+                    control={formProduct.control}
+                    name="categories"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={item.id}
+                          className={cx(
+                            item.parent && "ml-5",
+                            "flex flex-row items-start space-x-3 space-y-0"
+                          )}
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(item.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([...field.value, item.id])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== item.id
+                                      )
+                                    );
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal">
+                            {item.label}
+                          </FormLabel>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                ))}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormCategory />
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

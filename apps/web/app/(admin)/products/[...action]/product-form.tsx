@@ -14,13 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import TabsCategory from "../components/tabs-category";
@@ -33,7 +26,7 @@ export const ProductFormSchema = z.object({
     }),
   name: z.string({ required_error: "Name is required." }),
   brand: z.string(),
-  description: z.string(),
+  shortDescription: z.string(),
   images: z
     .array(
       z.object({
@@ -131,7 +124,7 @@ export function ProductForm() {
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stock</FormLabel>
+                      <FormLabel>Regular price</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="shadcn" {...field} />
                       </FormControl>
@@ -144,9 +137,9 @@ export function ProductForm() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>Sale Price</FormLabel>
                       <FormControl>
-                        <Input placeholder="shadcn" {...field} />
+                        <Input type="number" placeholder="shadcn" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -170,10 +163,10 @@ export function ProductForm() {
 
               <FormField
                 control={form.control}
-                name="description"
+                name="shortDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Short description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Tell us a little bit about yourself"
