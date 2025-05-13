@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import TabsCategory from "../components/tabs-category";
+import StatusCard from "../components/status-card";
+import { PropertiesTab } from "../components/properties-tabs";
 
 export const ProductFormSchema = z.object({
   categories: z
@@ -88,7 +90,7 @@ export function ProductForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2 ">
             <div className="flex flex-col gap-3">
               <FormField
@@ -98,7 +100,7 @@ export function ProductForm() {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="shadcn" {...field} />
+                      <Input placeholder="name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,10 +212,14 @@ export function ProductForm() {
             Add URL
           </Button>
         </div> */}
+              <PropertiesTab />
               <Button type="submit">Save</Button>
             </div>
           </div>
-          <TabsCategory />
+          <div className="flex flex-col gap-3">
+            <StatusCard />
+            <TabsCategory />
+          </div>
         </div>
       </form>
     </Form>
