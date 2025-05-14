@@ -71,7 +71,7 @@ const FormSchema = z.object({
 });
 
 const CategoryContent = () => {
-  const formProduct = useFormContext<z.infer<typeof ProductFormSchema>>();
+  // const formProduct = useFormContext<z.infer<typeof ProductFormSchema>>();
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     // toast({
@@ -87,7 +87,7 @@ const CategoryContent = () => {
     <>
       <Card>
         <CardContent className="space-y-2">
-          <FormField
+          {/* <FormField
             control={formProduct.control}
             name="categories"
             render={() => (
@@ -131,7 +131,7 @@ const CategoryContent = () => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <FormCategory />
         </CardContent>
       </Card>

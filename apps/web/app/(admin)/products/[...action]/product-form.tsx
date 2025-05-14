@@ -88,10 +88,10 @@ export function ProductForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2 ">
+    <div className="grid grid-cols-3 gap-3">
+      <div className="col-span-2 ">
+        <Form {...form}>
+          {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8"> */}
             <div className="flex flex-col gap-3">
               <FormField
                 control={form.control}
@@ -106,7 +106,6 @@ export function ProductForm() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="brand"
@@ -215,13 +214,13 @@ export function ProductForm() {
               <PropertiesTab />
               <Button type="submit">Save</Button>
             </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <StatusCard />
-            <TabsCategory />
-          </div>
-        </div>
-      </form>
-    </Form>
+          {/* </form> */}
+        </Form>
+      </div>
+      <div className="flex flex-col gap-3">
+        <StatusCard />
+        <TabsCategory />
+      </div>
+    </div>
   );
 }
