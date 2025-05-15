@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import TabsCategory from "../components/tabs-category";
 import StatusCard from "../components/status-card";
 import { PropertiesTab } from "../components/properties-tabs";
+import { Label } from "@/components/ui/label";
 
 export const ProductFormSchema = z.object({
   categories: z
@@ -53,169 +54,40 @@ export const ProductFormSchema = z.object({
   shippingType: z.string(),
 });
 
-type ProductFormValues = z.infer<typeof ProductFormSchema>;
-
-// This can come from your database or API.
-const defaultValues: Partial<ProductFormValues> = {
-  name: "I own a computer.",
-  // tags: [
-  //   { value: "https://shadcn.com" },
-  //   { value: "http://twitter.com/shadcn" },
-  // ],
-};
-
 export function ProductForm() {
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(ProductFormSchema),
-    defaultValues,
-    mode: "onChange",
-  });
-
-  // const { fields, append } = useFieldArray({
-  //   name: "tags",
-  //   control: form.control,
-  // });
-
-  function onSubmit(data: ProductFormValues) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-  }
-
   return (
     <div className="grid grid-cols-3 gap-3">
       <div className="col-span-2 ">
-        <Form {...form}>
-          {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8"> */}
-            <div className="flex flex-col gap-3">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="brand"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Brand</FormLabel>
-                    <FormControl>
-                      <Input placeholder="shadcn" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <FormField
-                  control={form.control}
-                  name="stock"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Regular price</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="shadcn" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sale Price</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="shadcn" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* <FormField
-          control={form.control}
-          name="manufacturer"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Manufacturer</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />*/}
-
-              <FormField
-                control={form.control}
-                name="shortDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Short description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Tell us a little bit about yourself"
-                        className="resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`tags.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && "sr-only")}>
-                    Tags
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && "sr-only")}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-2"
-            onClick={() => append({ value: "" })}
-          >
-            Add URL
-          </Button>
-        </div> */}
-              <PropertiesTab />
-              <Button type="submit">Save</Button>
+        <form className="space-y-8">
+          <div className="flex flex-col gap-3">
+            <div>
+              <Label>Name</Label>
+              <Input placeholder="name" name="name" />
             </div>
-          {/* </form> */}
-        </Form>
+            <div>
+              <Label>Stock</Label>
+              <Input placeholder="shadcn" name="shadcn" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Label>Regular price</Label>
+              <Input type="number" placeholder="shadcn" name="shadcn" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Label>Sale price</Label>
+              <Input type="number" placeholder="shadcn" name="shadcn" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Label>Short Description</Label>
+              <Input
+                type="number"
+                placeholder="shadcn"
+                name="shortDescription"
+              />
+            </div>
+            <PropertiesTab />
+            <Button type="submit">Save</Button>
+          </div>
+        </form>
       </div>
       <div className="flex flex-col gap-3">
         <StatusCard />

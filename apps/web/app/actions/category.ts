@@ -1,20 +1,35 @@
-"use server"
+"use server";
 
-import { apiFetch } from '@/app/lib/apiFetch';
-import { CategoryFormSchema } from '@/app/lib/definitions';
-export async function createCategory(formData: FormData) {
-    const validatedFields = CategoryFormSchema.safeParse({
-        name: formData.get("name"),
-        parentId: formData.get("parentId")
-    })
-    console.log(validatedFields)
-    try {
-        const res = await apiFetch("/categories", {
-            method: "POST",
-            body: validatedFields
-        })
+import { apiFetch } from "@/app/lib/apiFetch";
+import { Category, CategoryFormSchema } from "@/app/lib/definitions";
+type FormState = {
+  success: boolean;
+  data?: Category | null;
+  errors?: Record<string, string[]>;
+};
+export async function createCategory(prevState: FormState, payload: FormData) {
+  const formData = Object.fromEntries(payload);
+  const validatedFields = CategoryFormSchema.safeParse(formData);
+  console.log(validatedFields);
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      errors: validatedFields.error.flatten().fieldErrors,
+      data: null,
+    };
+  }
 
-    } catch (error) {
-        throw error
-    }
+  try {
+    const res = await apiFetch<Category>("/categories", {
+      method: "POST",
+      body: validatedFields.data,
+    });
+    return {
+      success: true,
+      data: res,
+      errors: {},
+    };
+  } catch (error) {
+    throw error;
+  }
 }

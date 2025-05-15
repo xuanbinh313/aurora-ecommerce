@@ -28,7 +28,6 @@ export async function apiFetch<T>(
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
     };
-    console.log("NEXT_PUBLIC_API_BASE_URL", process.env.NEXT_PUBLIC_API_BASE_URL)
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`, {
         ...fetchOptions,
         next: revalidate ? { revalidate } : undefined,
