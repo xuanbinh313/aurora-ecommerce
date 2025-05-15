@@ -29,8 +29,9 @@ func NewService(repo *infra.CategoryRepository) Service {
 func (p *categoryService) CreateCategory(ctx context.Context, req dto.CreateCategoryDto) error {
 
 	category := domain.Category{
-		Name: req.Name,
-		Slug: generateUniqueSlug(req.Name),
+		Name:     req.Name,
+		Slug:     generateUniqueSlug(req.Name),
+		ParentID: req.ParentID,
 		// Description: req.Description,
 		// Images:      req.Images,
 		// // CategoryAttributes: req.CategoryAttributes,
