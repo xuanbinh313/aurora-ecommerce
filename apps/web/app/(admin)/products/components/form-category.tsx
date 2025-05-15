@@ -1,4 +1,6 @@
+"use client";
 import { createCategory } from "@/app/actions/category";
+import { Category } from "@/app/lib/definitions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,21 +19,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@radix-ui/react-dropdown-menu";
+import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useActionState } from "react";
 
-const FormCategory = () => {
-  // const onSubmit = async (values: Schema) => {
-  //   const formData = new FormData();
-  //   Object.entries(values).forEach(([key, value]) => {
-  //     formData.append(key, value);
-  //   });
-  //   console.log(values);
-  //   const res = await fetch("/api/proxy/categories", {
-  //     method: "POST",
-  //     body: JSON.stringify(values),
-  //   });
-  // };
+export type FormCategoryProps = {
+  options: Category[];
+};
+
+const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
   const [pending, formAction] = useActionState(createCategory, {
     success: false,
     errors: {},
@@ -58,13 +54,18 @@ const FormCategory = () => {
             <div>
               <Label>Parent</Label>
               <Select name="parentId">
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="-- Parent category --" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="living_room">Living Room</SelectItem>
-                  <SelectItem value="bed_room">Bed Room</SelectItem>
-                  <SelectItem value="kitchen">Kitchen</SelectItem>
+                  {options?.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  )) ?? <SelectItem value="none">None</SelectItem>}
                 </SelectContent>
               </Select>
             </div>

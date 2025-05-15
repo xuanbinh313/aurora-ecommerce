@@ -6,7 +6,8 @@ import { NextResponse, NextRequest } from "next/server";
 export async function GET(req: NextRequest, { params }: { params: { path: string[] } }) {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth-token")?.value;
-    const endpoint = `/${params.path.join("/")}`;
+    const { path } = await params
+    const endpoint = `/${path.join("/")}`;
 
     // if (!token) {
     //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

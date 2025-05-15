@@ -28,6 +28,9 @@ import {
 import { cx } from "class-variance-authority";
 import { ProductFormSchema } from "../[...action]/product-form";
 import FormCategory from "./form-category";
+import { useQuery } from "@tanstack/react-query";
+import { Category } from "@/app/lib/definitions";
+import { useState, useTransition } from "react";
 const items = [
   {
     id: "recents",
@@ -72,7 +75,13 @@ const FormSchema = z.object({
 
 const CategoryContent = () => {
   // const formProduct = useFormContext<z.infer<typeof ProductFormSchema>>();
-
+  const { data, isFetching } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await fetch("/api/proxy/categories");
+      return response.json();
+    },
+  });
   function onSubmit(data: z.infer<typeof FormSchema>) {
     // toast({
     //   title: "You submitted the following values:",
@@ -83,10 +92,30 @@ const CategoryContent = () => {
     //   ),
     // });
   }
+  const options = ["Option 1", "Option 2", "Option 3"];
+  const [selected, setSelected] = useState<string[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const handleToggle = (option: string) => {
+    const updatedSelected = selected.includes(option)
+      ? selected.filter((item) => item !== option)
+      : [...selected, option];
+
+    setSelected(updatedSelected);
+    // startTransition(() => toggleCheckboxGroup(updatedSelected));
+  };
   return (
     <>
       <Card>
         <CardContent className="space-y-2">
+          {data?.map((option) => (
+            <div key={option.id} className="flex items-center gap-2">
+              <Checkbox
+                checked={selected.includes(option.id)}
+                onCheckedChange={() => handleToggle(option.id)}
+              />
+              <Label>{option.name}</Label>
+            </div>
+          ))}
           {/* <FormField
             control={formProduct.control}
             name="categories"
@@ -132,7 +161,7 @@ const CategoryContent = () => {
               </FormItem>
             )}
           /> */}
-          <FormCategory />
+          <FormCategory options={data || []} />
         </CardContent>
       </Card>
     </>
