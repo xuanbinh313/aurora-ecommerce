@@ -10,34 +10,34 @@ export const LoginFormSchema = z.object({
 });
 export const CategoryFormSchema = z.object({
   name: z.string().trim().nonempty("This field is required"),
-  parentId: z.string().optional(),
+  parent_id: z.string().optional(),
 });
 export type LoginFormState =
   | {
-      errors?: {
-        email?: string[];
-        password?: string[];
-      };
-      message?: string;
-    }
+    errors?: {
+      email?: string[];
+      password?: string[];
+    };
+    message?: string;
+  }
   | undefined;
 
 export type CategoryFormState =
   | {
-      errors?: {
-        name?: string[];
-        parentId?: string[];
-      };
-      message?: string;
-    }
+    errors?: {
+      name?: string[];
+      parent_id?: string[];
+    };
+    message?: string;
+  }
   | undefined;
 
 export type Category = {
   id: string;
   name: string;
-  parentId: string;
-  createdAt: string;
-  updatedAt: string;
+  parent_id: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export const ProductFormSchema = z.object({
@@ -48,11 +48,11 @@ export const ProductFormSchema = z.object({
   }),
   categories: z
     .array(z.string()),
-    // .refine((value) => value.some((item) => item), {
-    //   message: "You have to select at least one item.",
-    // }),
+  // .refine((value) => value.some((item) => item), {
+  //   message: "You have to select at least one item.",
+  // }),
   // brand: z.string({ required_error: "This field is required." }),
-  shortDescription: z.string(),
+  short_description: z.string(),
   images: z
     .array(
       z.object({
@@ -67,8 +67,13 @@ export const ProductFormSchema = z.object({
   //     value: z.string().url({ message: "Please enter a valid URL." }),
   //   })
   // ),
-  regularPrice: z.string().optional(),
-  salePrice: z.string().optional(),
+  regular_price: z.string().optional(),
+  sale_price: z.string().optional(),
+  sale_price_dates: z.object({
+    from: z.date(),
+    to: z.date()
+  }),
+  isSetSalePriceDates: z.boolean()
   // hasTax: z.boolean(),
   // tax: z.number(),
   // stock: z.number(),
@@ -76,17 +81,18 @@ export const ProductFormSchema = z.object({
   // continueSellingWhenOutOfStock: z.boolean(),
   // shippingType: z.string(),
 });
+export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;
 
 export interface Product {
   id: string;
   name: string;
   slug: string;
-  shortDescription: string;
-  regularPrice: number;
-  salePrice: number;
+  short_description: string;
+  regular_price: number;
+  sale_price: number;
   brand: string;
   images: string[];
   categories: Category[];
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }

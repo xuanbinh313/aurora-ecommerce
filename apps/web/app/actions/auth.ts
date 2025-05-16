@@ -28,7 +28,7 @@ export async function createUser(prevState: any, formData: FormData) {
     method: "POST",
     body: JSON.stringify({
       name: formData.get("name"),
-      parentId: formData.get("parentId"),
+      parent_id: formData.get("parent_id"),
     }),
     headers: {
       "Content-Type": "application/json",

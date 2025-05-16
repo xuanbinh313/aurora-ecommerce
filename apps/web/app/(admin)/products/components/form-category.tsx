@@ -41,11 +41,11 @@ const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
   const [] = useTransition();
 
   // 1. Define your form.
-  const form = useForm<{ name: string; parentId?: string }>({
+  const form = useForm<{ name: string; parent_id?: string }>({
     resolver: zodResolver(CategoryFormSchema),
     defaultValues: {
       name: "",
-      parentId: "",
+      parent_id: "",
     },
   });
   const { isPending, mutate } = useMutation({
@@ -77,8 +77,8 @@ const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
   function onSubmit(values: z.infer<typeof CategoryFormSchema>) {
     const formData = new FormData();
     formData.append("name", values.name);
-    if (values.parentId) {
-      formData.append("parentId", values.parentId);
+    if (values.parent_id) {
+      formData.append("parent_id", values.parent_id);
     }
     mutate(formData);
   }
@@ -111,7 +111,7 @@ const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
             />
             <FormField
               control={form.control}
-              name="parentId"
+              name="parent_id"
               render={({ field }) => (
                 <FormItem className="grid grid-cols gap-4">
                   <FormLabel>Parent</FormLabel>

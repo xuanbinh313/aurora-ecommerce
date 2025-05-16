@@ -26,7 +26,7 @@ const FormSchema = z.object({
     .refine((value) => value.some((item) => item), {
       message: "You have to select at least one item.",
     }),
-  parentId: z.string().optional(),
+  parent_id: z.string().optional(),
 });
 
 const CategoryContent = () => {
