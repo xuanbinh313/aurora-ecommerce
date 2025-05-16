@@ -28,5 +28,5 @@ func generateUniqueSlug(name string) string {
 		uniqueSlug = fmt.Sprintf("%s-%d", baseSlug, counter)
 	}
 
-	return uniqueSlug
+	return baseSlug
 }
