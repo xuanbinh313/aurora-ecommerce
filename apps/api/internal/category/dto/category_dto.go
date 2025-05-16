@@ -4,7 +4,7 @@ type CreateCategoryDto struct {
 	Name        string  `json:"name" binding:"required,min=3"`
 	Slug        *string `json:"slug,omitempty"`
 	Description *string `json:"description,omitempty"`
-	ParentID    *uint   `json:"parentId,string,omitempty"`
+	ParentID    *uint   `json:"parent_id,string,omitempty"`
 }
 
 type UpdateCategoryDto struct {
@@ -12,5 +12,5 @@ type UpdateCategoryDto struct {
 	Name        string  `json:"name" binding:"required,min=3"`
 	Slug        string  `json:"slug"`
 	Description *string `json:"description,omitempty"`
-	ParentID    string  `json:"parentId,omitempty"`
+	ParentID    string  `json:"parent_id,omitempty"`
 }

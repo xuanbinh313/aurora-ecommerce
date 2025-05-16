@@ -11,13 +11,13 @@ type Product struct {
 	Name             string
 	Type             string
 	Slug             string `gorm:"unique"`
-	ShortDescription string
+	ShortDescription string `json:"short_description"`
 	Description      string
 	Status           string
 	CategoryID       string
 	Category         domain.Category
 	Images           []domain.Image `gorm:"many2many:product_images;"`
-	RegularPrice     float64
+	RegularPrice     float64        `json:"regular_price"`
 }
 
 type Link struct {
