@@ -29,8 +29,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, PlusIcon } from "lucide-react";
-import { useActionState, useTransition } from "react";
+import { CircleCheck, CircleX, Loader2, PlusIcon } from "lucide-react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -39,11 +39,7 @@ export type FormCategoryProps = {
 };
 const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
   const [] = useTransition();
-  const [state, formAction, pending] = useActionState(createCategory, {
-    success: false,
-    errors: {},
-    data: null,
-  });
+
   // 1. Define your form.
   const form = useForm<{ name: string; parentId?: string }>({
     resolver: zodResolver(CategoryFormSchema),
@@ -52,23 +48,33 @@ const FormCategory: React.FC<FormCategoryProps> = ({ options = [] }) => {
       parentId: "",
     },
   });
-  const { isPending, mutate, error } = useMutation({
+  const { isPending, mutate } = useMutation({
     mutationFn: createCategory,
     onSuccess: (data) => {
       // handle success case with data returned from the server action
       toast({
-        title: "Success",
-        description: "Category created successfully",
-        variant: "default",
+        description: (
+          <span>
+            <CircleCheck color="green" />
+            Category created successfully
+          </span>
+        ),
+      });
+    },
+    onError: (error) => {
+      // handle error case
+      toast({
+        description: (
+          <span>
+            <CircleX color="red" />
+            {error.message}
+          </span>
+        ),
       });
     },
   });
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof CategoryFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    // Call your server action with the form values
     const formData = new FormData();
     formData.append("name", values.name);
     if (values.parentId) {
