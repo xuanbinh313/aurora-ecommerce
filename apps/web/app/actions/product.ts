@@ -1,11 +1,11 @@
-"use server"
+"use server";
 import { apiFetch } from "@/app/lib/apiFetch";
 import { Product, ProductFormSchema } from "@/app/lib/definitions";
 
 type FormState<T> = {
   success: boolean;
   data?: T | null;
-  errors?: Record<string, string[]>;
+  errors?: Record<string, string[]> | null;
 };
 export async function createProduct(
   prevState: FormState<Omit<Product, "id">>,
@@ -13,7 +13,6 @@ export async function createProduct(
 ): Promise<FormState<Product>> {
   const formData = Object.fromEntries(payload);
   const validatedFields = ProductFormSchema.safeParse(formData);
-  console.log(validatedFields);
   if (!validatedFields.success) {
     return {
       success: false,
@@ -21,7 +20,7 @@ export async function createProduct(
       data: null,
     };
   }
-  const { data, errors } = await apiFetch<Product>("/products", {
+  const [data, errors] = await apiFetch<Product>("/products", {
     method: "POST",
     body: JSON.stringify(validatedFields.data),
   });

@@ -1,4 +1,7 @@
 "use client";
+import { apiFetch } from "@/app/lib/apiFetch";
+import { Category } from "@/app/lib/definitions";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,62 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { useFormContext } from "react-hook-form";
-import { z } from "zod";
-
-// import { toast } from "@/components/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { cx } from "class-variance-authority";
-import { ProductFormSchema } from "../[...action]/product-form";
-import FormCategory from "./form-category";
+import { toast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { Category } from "@/app/lib/definitions";
-import { useState, useTransition } from "react";
-const items = [
-  {
-    id: "recents",
-    label: "Recents",
-    parent: null,
-  },
-  {
-    id: "home",
-    label: "Home",
-    parent: "recents",
-  },
-  {
-    id: "applications",
-    label: "Applications",
-    parent: "recents",
-  },
-  {
-    id: "desktop",
-    label: "Desktop",
-    parent: "recents",
-  },
-  {
-    id: "downloads",
-    label: "Downloads",
-    parent: null,
-  },
-  {
-    id: "documents",
-    label: "Documents",
-    parent: "recents",
-  },
-] as const;
+import { useState } from "react";
+import { z } from "zod";
+import FormCategory from "./form-category";
 
 const FormSchema = z.object({
   categories: z
@@ -78,8 +34,16 @@ const CategoryContent = () => {
   const { data, isFetching } = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await fetch("/api/proxy/categories");
-      return response.json();
+      const [data, err] = await apiFetch<Category[]>("/categories");
+      if (err || !data) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err,
+        });
+        throw new Error(err ?? "Unknown error");
+      }
+      return data;
     },
   });
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -92,16 +56,12 @@ const CategoryContent = () => {
     //   ),
     // });
   }
-  const options = ["Option 1", "Option 2", "Option 3"];
   const [selected, setSelected] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
   const handleToggle = (option: string) => {
     const updatedSelected = selected.includes(option)
       ? selected.filter((item) => item !== option)
       : [...selected, option];
-
     setSelected(updatedSelected);
-    // startTransition(() => toggleCheckboxGroup(updatedSelected));
   };
   return (
     <>

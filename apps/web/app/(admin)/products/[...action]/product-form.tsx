@@ -30,14 +30,29 @@ export function ProductForm() {
           <div className="flex flex-col gap-3">
             <Label>Name</Label>
             <Input placeholder="name" name="name" />
+            {actionState.errors?.name && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                {actionState.errors.name}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-3">
             <Label>Slug</Label>
             <Input placeholder="Slug" name="slug" />
+            {actionState.errors?.slug && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                {actionState.errors.slug}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-3">
             <Label>Short Description</Label>
             <Textarea placeholder="short description" name="shortDescription" />
+            {actionState.errors?.shortDescription && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                {actionState.errors.shortDescription}
+              </p>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-3">
@@ -47,10 +62,20 @@ export function ProductForm() {
                 placeholder="Regular Price"
                 name="regularPrice"
               />
+              {actionState.errors?.regularPrice && (
+                <p className="text-[0.8rem] font-medium text-destructive">
+                  {actionState.errors.regularPrice}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-3">
               <Label>Sale price</Label>
               <Input type="number" placeholder="Sale Price" name="salePrice" />
+              {actionState.errors?.salePrice && (
+                <p className="text-[0.8rem] font-medium text-destructive">
+                  {actionState.errors.salePrice}
+                </p>
+              )}
             </div>
           </div>
           <PropertiesTab />

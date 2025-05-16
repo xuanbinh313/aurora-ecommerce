@@ -1,35 +1,36 @@
 "use server";
 
 import { apiFetch } from "@/app/lib/apiFetch";
-import { Category, CategoryFormSchema } from "@/app/lib/definitions";
+import { Category } from "@/app/lib/definitions";
+import { FieldErrors } from "react-hook-form";
 type FormState = {
   success: boolean;
   data?: Category | null;
   errors?: Record<string, string[]>;
 };
-export async function createCategory(prevState: FormState, payload: FormData) {
-  const formData = Object.fromEntries(payload);
-  const validatedFields = CategoryFormSchema.safeParse(formData);
-  console.log(validatedFields);
-  if (!validatedFields.success) {
+export async function createCategory(payload: FormData) {
+  const formData = Object.fromEntries(payload.entries());
+  const body = {
+    name: formData.name,
+    parentId: formData.parentId,
+  };
+  const [res, err] = await apiFetch<Category>("/categories", {
+    method: "POST",
+    body,
+  });
+  if (err) {
     return {
       success: false,
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: {
+        name: err,
+        parentId: err,
+      },
       data: null,
     };
   }
-
-  try {
-    const res = await apiFetch<Category>("/categories", {
-      method: "POST",
-      body: validatedFields.data,
-    });
-    return {
-      success: true,
-      data: res,
-      errors: {},
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    success: true,
+    data: res,
+    errors: {},
+  };
 }
