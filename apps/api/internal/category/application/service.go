@@ -9,7 +9,7 @@ import (
 	"github.com/gosimple/slug"
 )
 
-type Service interface {
+type CategoryService interface {
 	GetCategories(ctx context.Context) ([]domain.Category, error)
 	GetCategoryById(ctx context.Context, id uint) (*domain.Category, error)
 	DeleteCategoryById(ctx context.Context, id uint) (*domain.Category, error)
@@ -21,7 +21,7 @@ type categoryService struct {
 	repo *infra.CategoryRepository
 }
 
-func NewService(repo *infra.CategoryRepository) Service {
+func NewCategoryService(repo *infra.CategoryRepository) CategoryService {
 	return &categoryService{repo: repo}
 }
 

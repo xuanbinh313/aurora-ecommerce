@@ -1,0 +1,6 @@
+[build]
+cmd = "go build -o ./app.exe cmd/server/main.go" # Đổi thành app.exe cho Windows
+bin = "./app.exe"                               # Chạy file app.exe
+exclude_dir = ["vendor"]                        # Bỏ qua thư mục không cần theo dõi
+include_ext = ["go", "tpl", "html", "toml"]     # Các file theo dõi
+delve = false                                   # Không dùng delve (gỡ lỗi)

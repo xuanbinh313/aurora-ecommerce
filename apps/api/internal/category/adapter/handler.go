@@ -16,7 +16,7 @@ type IDUri struct {
 }
 
 type Handler struct {
-	service application.Service
+	service application.CategoryService
 }
 
 func (h *Handler) GetCategories(c *gin.Context) {
@@ -99,7 +99,7 @@ func (h *Handler) DeleteCategoryById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, http.NoBody)
 }
-func NewHandler(service application.Service) *Handler {
+func NewHandler(service application.CategoryService) *Handler {
 	return &Handler{service: service}
 }
 

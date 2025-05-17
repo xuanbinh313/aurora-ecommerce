@@ -16,7 +16,7 @@ type IDUri struct {
 }
 
 type Handler struct {
-	service application.Service
+	service application.ProductService
 }
 
 func (h *Handler) GetProducts(c *gin.Context) {
@@ -99,7 +99,7 @@ func (h *Handler) DeleteProductById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, http.NoBody)
 }
-func NewHandler(service application.Service) *Handler {
+func NewHandler(service application.ProductService) *Handler {
 	return &Handler{service: service}
 }
 

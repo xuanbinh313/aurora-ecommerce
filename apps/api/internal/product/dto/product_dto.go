@@ -5,12 +5,14 @@ import (
 )
 
 type CreateProductRequestDto struct {
-	Name             string         `json:"name" binding:"required"`
-	Slug             string         `json:"slug"`
-	Description      string         `json:"description"`
-	ShortDescription string         `json:"short_description"`
-	Images           []domain.Image `json:"images" binding:"required,dive,required"`
-	RegularPrice     float64        `json:"regular_price"`
+	Name             string          `json:"name" binding:"required"`
+	Slug             *string         `json:"slug"`
+	Description      *string         `json:"description"`
+	ShortDescription *string         `json:"short_description"`
+	Images           *[]domain.Image `json:"images"`
+	RegularPrice     *string         `json:"regular_price,string"`
+	SalePrice        *string         `json:"sale_price,string"`
+	Categories       *[]string       `json:"categories"`
 }
 
 type ProductResponse struct {
