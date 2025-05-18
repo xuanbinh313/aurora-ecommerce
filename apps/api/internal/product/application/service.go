@@ -30,6 +30,7 @@ func NewProductService(productRepo *infra.ProductRepository, categoryRepo catego
 
 // CreateProduct implements Service.
 func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProductRequestDto) error {
+
 	regularPrice, err := utils.ParsePrice(req.RegularPrice)
 	if err != nil {
 		return err
