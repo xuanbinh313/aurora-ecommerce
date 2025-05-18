@@ -2,30 +2,46 @@
 
 import { createProduct } from "@/app/actions/product";
 import {
+  Product,
   ProductFormSchema,
   ProductFormSchemaType,
+  ProductValues,
 } from "@/app/lib/definitions";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { addDays } from "date-fns";
-import { useActionState, useRef } from "react";
+import { CircleCheck } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { PropertiesTab } from "../components/properties-tabs";
 import StatusCard from "../components/status-card";
 import TabsCategory from "../components/tabs-category";
 
-export function ProductForm() {
+interface ProductFormProps {
+  product?: Product;
+}
+
+export function ProductForm({ product }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const form = useForm<ProductFormSchemaType>({
+  const form = useForm<ProductValues>({
     defaultValues: {
+      id: undefined,
       name: "",
       slug: "",
+      categories: [],
       short_description: "",
-      regular_price: "",
-      sale_price: "",
+      regular_price: undefined,
+      sale_price: undefined,
       sale_price_dates: {
         from: new Date(),
         to: addDays(new Date(), 7),
@@ -34,65 +50,121 @@ export function ProductForm() {
     },
     resolver: zodResolver(ProductFormSchema),
   });
-  const [actionState, formAction, isPending] = useActionState(createProduct, {
-    success: false,
-    data: null,
-    errors: {},
-  });
-  console.log(actionState);
-  const handleSubmit = () => {
-    if (formRef.current) {
-      formAction(new FormData(formRef.current));
-    }
-  };
 
+  const { data, error, mutate } = useMutation({
+    mutationFn: createProduct,
+    onSuccess: (data) => {
+      toast({
+        description: (
+          <span>
+            <CircleCheck color="green" />
+            Product created successfully
+          </span>
+        ),
+      });
+    },
+    onError: (error) => {
+      try {
+        const parsedError = JSON.parse(error.message);
+        if (parsedError.errors) {
+          Object.entries(parsedError.errors).forEach(([field, message]) => {
+            form.setError(field as keyof ProductFormSchemaType, {
+              type: "server",
+              message: message as string,
+            });
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+  });
+  const handleSubmit = (values: ProductFormSchemaType) => {
+    console.log("values", values);
+    values.sale_price = Number(values.sale_price);
+    values.regular_price = Number(values.regular_price);
+    mutate(values);
+  };
+  useEffect(() => {
+    if (product) {
+      form.reset({
+        ...product,
+        categories: product.categories.map((category) => category.id),
+        sale_price_dates: {
+          from: new Date(product.sale_price_dates.from),
+          to: new Date(product.sale_price_dates.to),
+        },
+        images: product.images?.map((img) => ({ value: img })) || [],
+        regular_price: product.regular_price.toString(),
+        sale_price: product.sale_price.toString(),
+      });
+    }
+  }, [product, form]);
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <div className="col-span-2 ">
-        <Form {...form}>
-          <form
-            ref={formRef}
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-4"
-          >
-            <div className="flex flex-col gap-3">
-              <Label>Name</Label>
-              <Input placeholder="name" name="name" />
-              {actionState.errors?.name && (
-                <p className="text-[0.8rem] font-medium text-destructive">
-                  {actionState.errors.name}
-                </p>
+    <Form {...form}>
+      <form
+        ref={formRef}
+        onSubmit={form.handleSubmit(handleSubmit, (error) =>
+          console.log(error)
+        )}
+      >
+        <div className="grid grid-cols-3 gap-3">
+          <div className="col-span-2 space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Slug</Label>
-              <Input placeholder="Slug" name="slug" />
-              {actionState.errors?.slug && (
-                <p className="text-[0.8rem] font-medium text-destructive">
-                  {actionState.errors.slug}
-                </p>
+            />
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Slug" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label>Short Description</Label>
-              <Textarea
-                placeholder="short description"
-                name="short_description"
-              />
-              {actionState.errors?.short_description && (
-                <p className="text-[0.8rem] font-medium text-destructive">
-                  {actionState.errors.short_description}
-                </p>
+            />
+            <FormField
+              control={form.control}
+              name="short_description"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Short Description</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Short Description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
             <PropertiesTab />
-          </form>
-        </Form>
-      </div>
-      <div className="flex flex-col gap-3">
-        <StatusCard />
-        <TabsCategory />
-      </div>
-    </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <StatusCard />
+            <TabsCategory />
+          </div>
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -2,15 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { labels, priorities, statuses } from "../data/data";
-import { Task } from "../data/schema";
-import { DataTableColumnHeader } from "../../components/data-table-column-header";
-import { DataTableRowActions } from "../../components/data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Product } from "@/app/lib/definitions";
+import { Category } from "@/app/lib/definitions";
+import { DataTableColumnHeader } from "../../components/data-table-column-header";
+import { DataTableRowActions } from "../../components/data-table-row-actions";
+import { priorities, statuses } from "../../products/data/data";
 
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<Category>[] = [
   {
     id: "select",
     header: ({ table }) => (

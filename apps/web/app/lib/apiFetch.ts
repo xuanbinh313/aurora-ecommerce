@@ -13,7 +13,7 @@ interface FetchOptions {
 export async function apiFetch<T>(
   endpoint: string,
   options?: FetchOptions
-): Promise<[T | null, string | null]> {
+): Promise<T> {
   const { method = "GET", headers = {}, body, revalidate } = options || {};
 
   // Get the token from HTTP-only cookie
@@ -40,13 +40,11 @@ export async function apiFetch<T>(
 
     if (!response.ok) {
       const errorText = await response.text();
-      return [null, `API Error: ${response.status} - ${errorText}`];
+      throw new Error(errorText);
     }
     const data = (await response.json()) as T;
-    return [data, null];
+    return data;
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown Error";
-    return [null, errorMessage];
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 }

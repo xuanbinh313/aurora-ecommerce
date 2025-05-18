@@ -14,23 +14,26 @@ export async function createCategory(payload: FormData) {
     name: formData.name,
     parent_id: formData.parent_id,
   };
-  const [res, err] = await apiFetch<Category>("/categories", {
-    method: "POST",
-    body,
-  });
-  if (err) {
+  try {
+    const res = await apiFetch<Category>("/categories", {
+      method: "POST",
+      body,
+    });
+    return {
+      success: true,
+      data: res,
+      errors: {},
+    };
+  } catch (error) {
     return {
       success: false,
       errors: {
-        name: err,
-        parent_id: err,
+        name: error,
+        parent_id: error,
       },
       data: null,
     };
   }
-  return {
-    success: true,
-    data: res,
-    errors: {},
-  };
+
+
 }

@@ -1,6 +1,8 @@
 import { Separator } from "@/components/ui/separator";
 import { notFound } from "next/navigation";
 import { ProductForm } from "./product-form";
+import { apiFetch } from "@/app/lib/apiFetch";
+import { Product } from "@/app/lib/definitions";
 
 export default async function SettingsProfilePage({
   params,
@@ -8,11 +10,13 @@ export default async function SettingsProfilePage({
   params: Promise<{ action: string[] }>;
 }) {
   const { action } = await params;
+  let data: Product | undefined;
   if (action.length === 2 && action[1] === "edit") {
     console.log("edit action");
-  } else if (action.length === 1 && action[0] === "new") {
+    data = await apiFetch<Product>(`/products/${action[0]}`);
+  } else if (action.length === 1 && action[0] === "create") {
     console.log("create action");
-  } else if (action.length === 1 && action[0] !== "new") {
+  } else if (action.length === 1 && action[0] !== "view") {
     console.log("view action");
   } else {
     return notFound();
@@ -28,7 +32,7 @@ export default async function SettingsProfilePage({
         </div>
       </div>
       <Separator />
-      <ProductForm />
+      <ProductForm product={data} />
     </div>
   );
 }

@@ -1,10 +1,12 @@
-import { Metadata } from "next";
-import { DataTable } from "./components/data-table";
-import { taskSchema } from "./data/schema";
+import { apiFetch } from "@/app/lib/apiFetch";
+import { Product } from "@/app/lib/definitions";
 import { promises as fs } from "fs";
+import { Metadata } from "next";
 import path from "path";
 import { z } from "zod";
 import { columns } from "./components/columns";
+import { DataTable } from "../components/data-table";
+import { taskSchema } from "./data/schema";
 
 export const metadata: Metadata = {
   title: "Tasks",
@@ -22,7 +24,7 @@ async function getTasks() {
   return z.array(taskSchema).parse(tasks);
 }
 export default async function ProductsPage() {
-  const tasks = await getTasks();
+  const data = await apiFetch<Product[]>("/products");
   return (
     <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
       <div className="flex items-center justify-between space-y-2">
@@ -33,7 +35,7 @@ export default async function ProductsPage() {
           </p>
         </div>
       </div>
-      <DataTable data={tasks} columns={columns} />
+      <DataTable<Product, typeof columns> data={data} columns={columns} />
     </div>
   );
 }

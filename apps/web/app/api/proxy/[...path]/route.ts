@@ -17,7 +17,7 @@ export async function GET(
   // }
 
   try {
-    const [data, errors] = await apiFetch(endpoint, {
+    const data = await apiFetch(endpoint, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

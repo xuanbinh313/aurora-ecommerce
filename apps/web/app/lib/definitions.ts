@@ -33,66 +33,75 @@ export type CategoryFormState =
   | undefined;
 
 export type Category = {
-  id: string;
+  id: number;
   name: string;
   parent_id: string;
   created_at: string;
   updated_at: string;
 };
-
+export type ProductValues = {
+  id?: number;
+  name: string;
+  slug?: string;
+  short_description?: string;
+  regular_price?: string;
+  sale_price?: string;
+  categories: string[];
+  sale_price_dates: {
+    from: Date,
+    to: Date,
+  },
+  isSetSalePriceDates: boolean
+}
 export const ProductFormSchema = z.object({
+  id: z.number().optional(),
   name: z.string().nonempty("This field is required."),
-  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message:
-      "Slug must be lowercase and contain only letters, numbers, and dashes.",
-  }),
-  categories: z
-    .array(z.string()),
+  slug: z.string().optional(),
+  categories: z.array(z.string().transform(val => Number(val))),
   // .refine((value) => value.some((item) => item), {
   //   message: "You have to select at least one item.",
   // }),
-  // brand: z.string({ required_error: "This field is required." }),
-  short_description: z.string(),
-  images: z
-    .array(
-      z.object({
-        value: z.string().url({ message: "Please enter a valid URL." }),
-      })
-    )
-    .optional(),
-  // productAttributes: z.number(),
-  // variants: z.number(),
-  // tags: z.array(
-  //   z.object({
-  //     value: z.string().url({ message: "Please enter a valid URL." }),
-  //   })
-  // ),
-  regular_price: z.string().optional(),
-  sale_price: z.string().optional(),
+  short_description: z.string().optional(),
+  // images: z
+  //   .array(
+  //     z.object({
+  //       value: z.string().url({ message: "Please enter a valid URL." }),
+  //     })
+  //   )
+  //   .optional(),
+  regular_price: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : undefined)),
+  sale_price: z
+    .string()
+    .optional()
+    .transform((val) => (val ? Number(val) : undefined)),
   sale_price_dates: z.object({
     from: z.date(),
     to: z.date()
   }),
-  isSetSalePriceDates: z.boolean()
-  // hasTax: z.boolean(),
-  // tax: z.number(),
-  // stock: z.number(),
-  // trackQuantity: z.boolean(),
-  // continueSellingWhenOutOfStock: z.boolean(),
-  // shippingType: z.string(),
+  isSetSalePriceDates: z.boolean(),
+  status: z.string().optional(),
+  visibility: z.string().optional(),
+
 });
 export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;
 
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   short_description: string;
-  regular_price: number;
-  sale_price: number;
+  regular_price: string;
+  sale_price: string;
   brand: string;
-  images: string[];
   categories: Category[];
   created_at: string;
   updated_at: string;
+  sale_price_dates: {
+    from: string,
+    to: string,
+  },
+  isSetSalePriceDates: boolean
 }

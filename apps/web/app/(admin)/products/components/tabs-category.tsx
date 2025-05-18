@@ -1,6 +1,6 @@
 "use client";
 import { apiFetch } from "@/app/lib/apiFetch";
-import { Category } from "@/app/lib/definitions";
+import { Category, ProductFormSchemaType } from "@/app/lib/definitions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,12 +11,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { cx } from "class-variance-authority";
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import FormCategory from "./form-category";
 
@@ -30,21 +38,10 @@ const FormSchema = z.object({
 });
 
 const CategoryContent = () => {
-  // const formProduct = useFormContext<z.infer<typeof ProductFormSchema>>();
+  const formProduct = useFormContext<ProductFormSchemaType>();
   const { data, isFetching } = useQuery<Category[]>({
     queryKey: ["categories"],
-    queryFn: async () => {
-      const [data, err] = await apiFetch<Category[]>("/categories");
-      if (err || !data) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: err,
-        });
-        throw new Error(err ?? "Unknown error");
-      }
-      return data;
-    },
+    queryFn: async () => apiFetch<Category[]>("/categories"),
   });
   function onSubmit(data: z.infer<typeof FormSchema>) {
     // toast({
@@ -67,21 +64,12 @@ const CategoryContent = () => {
     <>
       <Card>
         <CardContent className="space-y-2">
-          {data?.map((option) => (
-            <div key={option.id} className="flex items-center gap-2">
-              <Checkbox
-                checked={selected.includes(option.id)}
-                onCheckedChange={() => handleToggle(option.id)}
-              />
-              <Label>{option.name}</Label>
-            </div>
-          ))}
-          {/* <FormField
+          <FormField
             control={formProduct.control}
             name="categories"
             render={() => (
               <FormItem>
-                {items.map((item) => (
+                {data?.map((item) => (
                   <FormField
                     key={item.id}
                     control={formProduct.control}
@@ -91,7 +79,7 @@ const CategoryContent = () => {
                         <FormItem
                           key={item.id}
                           className={cx(
-                            item.parent && "ml-5",
+                            item.parent_id && "ml-5",
                             "flex flex-row items-start space-x-3 space-y-0"
                           )}
                         >
@@ -110,7 +98,7 @@ const CategoryContent = () => {
                             />
                           </FormControl>
                           <FormLabel className="text-sm font-normal">
-                            {item.label}
+                            {item.name}
                           </FormLabel>
                         </FormItem>
                       );
@@ -120,7 +108,7 @@ const CategoryContent = () => {
                 <FormMessage />
               </FormItem>
             )}
-          /> */}
+          />
           <FormCategory options={data || []} />
         </CardContent>
       </Card>
