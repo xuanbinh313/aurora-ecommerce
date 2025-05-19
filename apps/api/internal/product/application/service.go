@@ -97,7 +97,9 @@ func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.P
 
 // GetProducts implements Service.
 func (p *productService) GetProducts(ctx context.Context) ([]domain.Product, error) {
-	return p.productRepo.Find()
+	var products []domain.Product
+	err := p.productRepo.DB().Preload("Categories").Find(&products).Error
+	return products, err
 }
 
 // Hàm tạo slug duy nhất
