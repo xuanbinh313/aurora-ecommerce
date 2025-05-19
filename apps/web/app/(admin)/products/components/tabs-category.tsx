@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { cx } from "class-variance-authority";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import FormCategory from "./form-category";
@@ -60,6 +60,53 @@ const CategoryContent = () => {
       : [...selected, option];
     setSelected(updatedSelected);
   };
+  const renderCategories = (
+    categories: Category[],
+    parentId: number | null = null,
+    level = 0
+  ) => {
+    return categories
+      .filter((category) => category.parent_id === parentId)
+      .map((category) => (
+        <Fragment key={category.id}>
+          <FormField
+            control={formProduct.control}
+            name="categories"
+            render={({ field }) => (
+              <FormItem
+                className={cx(
+                  `ml-${level * 5}`,
+                  "flex flex-row items-start space-x-3 space-y-0"
+                )}
+              >
+                <FormControl>
+                  <Checkbox
+                    checked={field.value?.includes(category.id.toString())}
+                    onCheckedChange={(checked) => {
+                      return checked
+                        ? field.onChange([
+                            ...field.value,
+                            category.id.toString(),
+                          ])
+                        : field.onChange(
+                            field.value?.filter(
+                              (value) => value !== category.id.toString()
+                            )
+                          );
+                    }}
+                  />
+                </FormControl>
+                <FormLabel className="text-sm font-normal">
+                  {category.name}
+                </FormLabel>
+              </FormItem>
+            )}
+          />
+          {renderCategories(categories, category.id, level + 1)}
+        </Fragment>
+      ));
+  };
+
   return (
     <>
       <Card>
@@ -69,42 +116,7 @@ const CategoryContent = () => {
             name="categories"
             render={() => (
               <FormItem>
-                {data?.map((item) => (
-                  <FormField
-                    key={item.id}
-                    control={formProduct.control}
-                    name="categories"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item.id}
-                          className={cx(
-                            item.parent_id && "ml-5",
-                            "flex flex-row items-start space-x-3 space-y-0"
-                          )}
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item.id.toString())}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item.id.toString()])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== item.id.toString()
-                                      )
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            {item.name}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                {renderCategories(data || [])}
                 <FormMessage />
               </FormItem>
             )}
