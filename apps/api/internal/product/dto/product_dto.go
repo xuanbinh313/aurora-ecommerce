@@ -2,17 +2,18 @@ package dto
 
 import (
 	"ecommerce/internal/category/domain"
+	"ecommerce/utils"
 )
 
 type CreateProductRequestDto struct {
-	Name             string          `json:"name" binding:"required"`
-	Slug             *string         `json:"slug"`
-	Description      *string         `json:"description"`
-	ShortDescription *string         `json:"short_description"`
-	Images           *[]domain.Image `json:"images"`
-	RegularPrice     *string         `json:"regular_price,string"`
-	SalePrice        *string         `json:"sale_price,string"`
-	Categories       *[]string       `json:"categories"`
+	Name             string              `json:"name" binding:"required"`
+	Slug             *string             `json:"slug"`
+	Description      *string             `json:"description"`
+	ShortDescription *string             `json:"short_description"`
+	Images           *[]domain.Image     `json:"images"`
+	RegularPrice     utils.Float64Custom `json:"regular_price"`
+	SalePrice        utils.Float64Custom `json:"sale_price"`
+	Categories       *[]string           `json:"categories"`
 }
 
 type ProductResponse struct {

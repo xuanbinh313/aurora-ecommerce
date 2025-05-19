@@ -7,6 +7,10 @@ type BaseRepository[T any] struct {
 	db *gorm.DB
 }
 
+func (r *BaseRepository[T]) DB() *gorm.DB {
+	return r.db
+}
+
 // NewBaseRepository creates a new BaseRepository
 func NewBaseRepository[T any](db *gorm.DB) *BaseRepository[T] {
 	return &BaseRepository[T]{db: db}

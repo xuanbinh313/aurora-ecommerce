@@ -18,3 +18,16 @@ func NewCategoryRepository(db *gorm.DB) *CategoryRepository {
 		BaseRepository: common.NewBaseRepository[domain.Category](db),
 	}
 }
+
+// FindByNameOrIDs tìm kiếm category với name LIKE hoặc IDs
+func (r *CategoryRepository) FindByNameOrIDs(ids []uint) ([]domain.Category, error) {
+	var categories []domain.Category
+	query := r.BaseRepository.DB()
+	// Tìm kiếm với IN cho ID nếu có
+	if len(ids) > 0 {
+		query = query.Where("id IN ?", ids)
+	}
+
+	err := query.Find(&categories).Error
+	return categories, err
+}

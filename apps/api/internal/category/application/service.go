@@ -15,6 +15,7 @@ type CategoryService interface {
 	DeleteCategoryById(ctx context.Context, id uint) (*domain.Category, error)
 	CreateCategory(ctx context.Context, p dto.CreateCategoryDto) error
 	UpdateCategory(ctx context.Context, id uint, p domain.Category) (*domain.Category, error)
+	GetCategoriesByIDs(ctx context.Context, ids []uint) ([]domain.Category, error)
 }
 
 type categoryService struct {
@@ -97,6 +98,11 @@ func (p *categoryService) GetCategoryById(ctx context.Context, id uint) (*domain
 // GetCategories implements Service.
 func (p *categoryService) GetCategories(ctx context.Context) ([]domain.Category, error) {
 	return p.repo.Find()
+}
+
+// GetCategoriesById implements Service.
+func (p *categoryService) GetCategoriesByIDs(ctx context.Context, ids []uint) ([]domain.Category, error) {
+	return p.repo.FindByNameOrIDs(ids)
 }
 
 // Hàm tạo slug duy nhất

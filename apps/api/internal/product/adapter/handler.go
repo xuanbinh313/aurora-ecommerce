@@ -5,7 +5,6 @@ import (
 	"ecommerce/internal/product/application"
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -44,8 +43,6 @@ func (h *Handler) GetProductById(c *gin.Context) {
 }
 
 func (h *Handler) CreateProduct(c *gin.Context) {
-	fmt.Println("TRIGGER")
-
 	var requestNewProduct dto.CreateProductRequestDto
 	if err := c.ShouldBindJSON(&requestNewProduct); err != nil {
 		if validationErrs := domain.ParseValidationErrors(err, requestNewProduct); validationErrs != nil {

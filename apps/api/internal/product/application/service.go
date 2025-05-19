@@ -20,33 +20,38 @@ type ProductService interface {
 }
 
 type productService struct {
-	productRepo  *infra.ProductRepository
-	categoryRepo categoryService.CategoryService
+	productRepo     *infra.ProductRepository
+	categoryService categoryService.CategoryService
 }
 
-func NewProductService(productRepo *infra.ProductRepository, categoryRepo categoryService.CategoryService) ProductService {
-	return &productService{productRepo: productRepo, categoryRepo: categoryRepo}
+func NewProductService(productRepo *infra.ProductRepository, categoryService categoryService.CategoryService) ProductService {
+	return &productService{productRepo: productRepo, categoryService: categoryService}
 }
 
 // CreateProduct implements Service.
 func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProductRequestDto) error {
-
-	regularPrice, err := utils.ParsePrice(req.RegularPrice)
+	var categoryIDs []uint
+	// Assuming req.Categories contains category names, join them as a comma-separated string
+	// If req.Categories contains IDs, parse them accordingly
+	if req.Categories != nil {
+		for _, cat := range *req.Categories {
+			// Try to parse as uint, if fails, treat as name
+			if id, err := utils.ParseUint(cat); err == nil {
+				categoryIDs = append(categoryIDs, id)
+			}
+		}
+	}
+	categories, err := p.categoryService.GetCategoriesByIDs(ctx, categoryIDs)
 	if err != nil {
 		return err
 	}
-	salePrice, err := utils.ParsePrice(req.SalePrice)
-	if err != nil {
-		return err
-	}
-	// categories:= category.
 	product := domain.Product{
 		Name:             req.Name,
 		Slug:             generateUniqueSlug(req.Name),
 		ShortDescription: req.ShortDescription,
-		SalePrice:        salePrice,
-		RegularPrice:     regularPrice,
-		// Categories:       req.C,
+		SalePrice:        req.SalePrice.Value,
+		RegularPrice:     req.RegularPrice.Value,
+		Categories:       categories,
 	}
 	return p.productRepo.Create(&product)
 }
@@ -82,11 +87,12 @@ func (p *productService) DeleteProductById(ctx context.Context, id uint) (*domai
 
 // GetProductById implements Service.
 func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.Product, error) {
-	product, err := p.productRepo.FindById(id)
+	var product domain.Product
+	err := p.productRepo.BaseRepository.DB().Preload("Categories").First(&product, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return product, nil
+	return &product, nil
 }
 
 // GetProducts implements Service.

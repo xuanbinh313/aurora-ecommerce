@@ -35,3 +35,36 @@ yarn-error.log*
 
 # ui
 dist/
+
+# For golang gin
+# Golang Binaries
+main
+*.exe
+*.out
+*.test
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Golang Modules (Không ignore go.mod, go.sum)
+go.work
+go.work.sum
+
+# Go build and cache
+/.idea/
+/.vscode/
+/*.code-workspace
+*.log
+*.tmp
+*.swp
+*.prof
+*.out
+
+# Local environment config
+.env
+.env.*
+
+
+
+
