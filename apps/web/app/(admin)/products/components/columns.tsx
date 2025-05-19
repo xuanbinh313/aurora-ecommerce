@@ -45,14 +45,26 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "category.name",
+    accessorKey: "categories",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
-    // cell: ({ row }) => {
-    //   console.log("row", row);
-    //   return <div className="w-[80px]">{row.getValue("category")}</div>;
-    // },
+    cell: ({ row }) => {
+      const categories = row.getValue("categories") as Product["categories"];
+      return (
+        <>
+          {categories.slice(0,2).map((cat) => (
+            <Badge
+              key={cat.id}
+              variant="outline"
+              className="mr-2 mb-2 rounded-md"
+            >
+              {cat.name}
+            </Badge>
+          ))}
+        </>
+      );
+    },
 
     // cell: ({ row }) => {
     //   const label = labels.find((label) => label.value === row.original.label);
