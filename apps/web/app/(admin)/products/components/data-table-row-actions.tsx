@@ -18,19 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { labels } from "../products/data/data";
-import { taskSchema } from "../products/data/schema";
+import { labels } from "../data/data";
+import { taskSchema } from "../data/schema";
 import { useRouter } from "next/navigation";
-import { ProductFormSchema } from "@/app/lib/definitions";
+import { Product, ProductFormSchema } from "@/app/lib/definitions";
 
-interface DataTableRowActionsProps<TData> {
-  row: Row<TData>;
+interface DataTableRowActionsProps {
+  row: Row<Product>;
 }
 
-export function DataTableRowActions<TData>({
-  row,
-}: DataTableRowActionsProps<TData>) {
-  // const product = ProductFormSchema.parse(row.original);
+export function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -44,11 +41,11 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        {/* <DropdownMenuItem
-          onClick={() => router.push(`/products/${product.id}/edit`)}
+        <DropdownMenuItem
+          onClick={() => router.push(`/products/${row.original.id}/edit`)}
         >
           Edit
-        </DropdownMenuItem> */}
+        </DropdownMenuItem>
         <DropdownMenuItem>Make a copy</DropdownMenuItem>
         <DropdownMenuItem>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />

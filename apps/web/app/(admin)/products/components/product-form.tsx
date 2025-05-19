@@ -107,8 +107,10 @@ export function ProductForm({ product }: ProductFormProps) {
             : {}),
         },
         // images: product.images?.map((img) => ({ value: img })) || [],
-        regular_price: product.regular_price.toString(),
-        sale_price: product.sale_price.toString(),
+        regular_price: product.regular_price
+          ? product.regular_price.toString()
+          : "",
+        sale_price: product.sale_price ? product.sale_price.toString() : "",
       });
     }
   }, [product, form]);
