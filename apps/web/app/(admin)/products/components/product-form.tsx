@@ -5,7 +5,6 @@ import {
   Product,
   ProductFormSchema,
   ProductFormSchemaType,
-  ProductValues,
 } from "@/app/lib/definitions";
 import {
   Form,
@@ -23,9 +22,9 @@ import { addDays } from "date-fns";
 import { CircleCheck } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { PropertiesTab } from "../components/properties-tabs";
-import StatusCard from "../components/status-card";
-import TabsCategory from "../components/tabs-category";
+import { PropertiesTab } from "./properties-tabs";
+import StatusCard from "./status-card";
+import TabsCategory from "./tabs-category";
 
 interface ProductFormProps {
   product?: Product;
@@ -33,15 +32,15 @@ interface ProductFormProps {
 
 export function ProductForm({ product }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const form = useForm<ProductValues>({
+  const form = useForm<ProductFormSchemaType>({
     defaultValues: {
       id: undefined,
       name: "",
       slug: "",
-      categories: [],
       short_description: "",
-      regular_price: undefined,
-      sale_price: undefined,
+      categories: [],
+      regular_price: "",
+      sale_price: "",
       sale_price_dates: {
         from: new Date(),
         to: addDays(new Date(), 7),
@@ -51,7 +50,7 @@ export function ProductForm({ product }: ProductFormProps) {
     resolver: zodResolver(ProductFormSchema),
   });
 
-  const { data, error, mutate } = useMutation({
+  const { data, mutate } = useMutation({
     mutationFn: createProduct,
     onSuccess: (data) => {
       toast({
@@ -88,26 +87,32 @@ export function ProductForm({ product }: ProductFormProps) {
     },
   });
   const handleSubmit = (values: ProductFormSchemaType) => {
-    console.log("values", values);
-    values.sale_price = Number(values.sale_price);
-    values.regular_price = Number(values.regular_price);
     mutate(values);
   };
+  console.log("data", data);
   useEffect(() => {
     if (product) {
       form.reset({
         ...product,
-        categories: product.categories.map((category) => category.id),
+        categories: product.categories.map((category) =>
+          category.id.toString()
+        ),
         sale_price_dates: {
-          from: new Date(product.sale_price_dates.from),
-          to: new Date(product.sale_price_dates.to),
+          ...(product?.sale_price_dates?.from
+            ? { from: new Date(product.sale_price_dates.from) }
+            : {}),
+
+          ...(product?.sale_price_dates?.to
+            ? { to: new Date(product.sale_price_dates.to) }
+            : {}),
         },
-        images: product.images?.map((img) => ({ value: img })) || [],
+        // images: product.images?.map((img) => ({ value: img })) || [],
         regular_price: product.regular_price.toString(),
         sale_price: product.sale_price.toString(),
       });
     }
   }, [product, form]);
+  console.log("form", form.getValues());
   return (
     <Form {...form}>
       <form

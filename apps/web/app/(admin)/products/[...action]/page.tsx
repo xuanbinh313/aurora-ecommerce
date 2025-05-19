@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { notFound } from "next/navigation";
-import { ProductForm } from "./product-form";
+import { ProductForm } from "../components/product-form";
 import { apiFetch } from "@/app/lib/apiFetch";
 import { Product } from "@/app/lib/definitions";
 
