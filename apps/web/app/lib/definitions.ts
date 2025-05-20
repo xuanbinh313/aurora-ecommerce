@@ -39,20 +39,9 @@ export type Category = {
   created_at: string;
   updated_at: string;
 };
-export type ProductValues = {
-  id?: number;
-  name: string;
-  slug?: string;
-  short_description?: string;
-  categories: string[];
-  // regular_price?: string;
-  // sale_price?: string;
-  // sale_price_dates: {
-  //   from: Date,
-  //   to: Date,
-  // },
-  // isSetSalePriceDates: boolean
-};
+
+export const StatusEnum = z.enum(["DRAFT", "PUBLISHED"]);
+export const VisibilityEnum = z.enum(["PRIVATE", "PUBLIC"]);
 export const ProductFormSchema = z.object({
   id: z.number().optional(),
   name: z.string().nonempty("This field is required."),
@@ -76,8 +65,8 @@ export const ProductFormSchema = z.object({
     to: z.date(),
   }),
   isSetSalePriceDates: z.boolean(),
-  status: z.string().optional(),
-  visibility: z.string().optional(),
+  status: StatusEnum,
+  visibility: VisibilityEnum,
 });
 export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;
 
@@ -97,4 +86,14 @@ export interface Product {
     to: string;
   };
   isSetSalePriceDates: boolean;
+  status: z.infer<typeof StatusEnum>;
+  visibility: z.infer<typeof VisibilityEnum>;
+}
+
+export interface PaginationResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
 }

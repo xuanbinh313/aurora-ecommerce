@@ -5,6 +5,7 @@ import {
   Product,
   ProductFormSchema,
   ProductFormSchemaType,
+  StatusEnum,
 } from "@/app/lib/definitions";
 import {
   Form,
@@ -46,6 +47,8 @@ export function ProductForm({ product }: ProductFormProps) {
         to: addDays(new Date(), 7),
       },
       isSetSalePriceDates: false,
+      status: "DRAFT",
+      visibility: "PRIVATE",
     },
     resolver: zodResolver(ProductFormSchema),
   });
@@ -89,7 +92,6 @@ export function ProductForm({ product }: ProductFormProps) {
   const handleSubmit = (values: ProductFormSchemaType) => {
     mutate(values);
   };
-  console.log("data", data);
   useEffect(() => {
     if (product) {
       form.reset({
@@ -114,7 +116,6 @@ export function ProductForm({ product }: ProductFormProps) {
       });
     }
   }, [product, form]);
-  console.log("form", form.getValues());
   return (
     <Form {...form}>
       <form

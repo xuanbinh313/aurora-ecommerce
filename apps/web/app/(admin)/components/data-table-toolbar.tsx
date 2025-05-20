@@ -38,10 +38,10 @@ export function DataTableToolbar<TData>({
             options={statuses}
           />
         )}
-        {table.getColumn("priority") && (
+        {table.getColumn("visibility") && (
           <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
+            column={table.getColumn("visibility")}
+            title="Visibility"
             options={priorities}
           />
         )}

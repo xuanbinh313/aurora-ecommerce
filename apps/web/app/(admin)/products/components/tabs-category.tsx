@@ -1,6 +1,10 @@
 "use client";
 import { apiFetch } from "@/app/lib/apiFetch";
-import { Category, ProductFormSchemaType } from "@/app/lib/definitions";
+import {
+  Category,
+  PaginationResponse,
+  ProductFormSchemaType,
+} from "@/app/lib/definitions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,9 +43,12 @@ const FormSchema = z.object({
 
 const CategoryContent = () => {
   const formProduct = useFormContext<ProductFormSchemaType>();
-  const { data, isFetching } = useQuery<Category[]>({
+  const {
+    data,
+    isFetching,
+  } = useQuery<PaginationResponse<Category>>({
     queryKey: ["categories"],
-    queryFn: async () => apiFetch<Category[]>("/categories"),
+    queryFn: async () => apiFetch<PaginationResponse<Category>>("/categories"),
   });
   function onSubmit(data: z.infer<typeof FormSchema>) {
     // toast({
@@ -74,10 +81,7 @@ const CategoryContent = () => {
             name="categories"
             render={({ field }) => (
               <FormItem
-                className={cx(
-                  `ml-${level * 5}`,
-                  "flex flex-row items-start space-x-3 space-y-0"
-                )}
+                className={cx(`ml-${level * 5}`, "flex flex-row items-start")}
               >
                 <FormControl>
                   <Checkbox
@@ -116,12 +120,12 @@ const CategoryContent = () => {
             name="categories"
             render={() => (
               <FormItem>
-                {renderCategories(data || [])}
+                {renderCategories(data?.data || [])}
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormCategory options={data || []} />
+          <FormCategory options={data?.data || []} />
         </CardContent>
       </Card>
     </>

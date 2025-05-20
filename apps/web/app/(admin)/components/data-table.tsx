@@ -44,9 +44,9 @@ export function DataTable<TData, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-
+  const defaultData = React.useMemo(() => [], []);
   const table = useReactTable({
-    data,
+    data: data ?? defaultData,
     columns,
     state: {
       sorting,
@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-  
+
   return (
     <div className="space-y-4">
       <DataTableToolbar table={table} />
