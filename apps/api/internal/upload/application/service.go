@@ -17,7 +17,7 @@ import (
 	"github.com/nfnt/resize"
 )
 
-type Service interface {
+type UploadService interface {
 	Upload(ctx context.Context, files []*multipart.FileHeader) ([]domain.Media, error)
 }
 
@@ -46,7 +46,7 @@ func (s *uploadService) Upload(ctx context.Context, files []*multipart.FileHeade
 	return medias, nil
 }
 
-func NewUpload(repo *infra.UploadRepository) Service {
+func NewUpload(repo *infra.UploadRepository) UploadService {
 	return &uploadService{repo: repo}
 }
 

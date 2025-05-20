@@ -12,7 +12,7 @@ type IDUri struct {
 }
 
 type Handler struct {
-	service application.Service
+	service application.UploadService
 }
 
 func (h *Handler) UploadMediaFile(c *gin.Context) {
@@ -26,7 +26,7 @@ func (h *Handler) UploadMediaFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully", "data": medias})
 }
 
-func NewHandler(service application.Service) *Handler {
+func NewHandler(service application.UploadService) *Handler {
 	return &Handler{service: service}
 }
 
