@@ -6,4 +6,4 @@ export GOCACHE="$HOME/AppData/Local/go-build"
 export GOMODCACHE="$HOME/go/pkg/mod"
 export GOPATH="$HOME/go"
 # go run cmd/server/main.go
-air .air.toml
+air -c .air.toml
