@@ -1,12 +1,7 @@
 "use client";
 
 import { createProduct } from "@/app/actions/product";
-import {
-  Product,
-  ProductFormSchema,
-  ProductFormSchemaType,
-  StatusEnum,
-} from "@/app/lib/definitions";
+import { Product } from "@/app/lib/definitions";
 import {
   Form,
   FormControl,
@@ -26,6 +21,9 @@ import { useForm } from "react-hook-form";
 import { PropertiesTab } from "./properties-tabs";
 import StatusCard from "./status-card";
 import TabsCategory from "./tabs-category";
+import ImageThumbnail from "./images-cards";
+import { uploadFiles } from "@/app/actions/upload";
+import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
 
 interface ProductFormProps {
   product?: Product;
@@ -49,6 +47,8 @@ export function ProductForm({ product }: ProductFormProps) {
       isSetSalePriceDates: false,
       status: "DRAFT",
       visibility: "PRIVATE",
+      file: undefined,
+      thumbnail: undefined,
     },
     resolver: zodResolver(ProductFormSchema),
   });
@@ -89,8 +89,46 @@ export function ProductForm({ product }: ProductFormProps) {
       }
     },
   });
+  const { data: upload, mutateAsync: mutateUpload } = useMutation({
+    mutationFn: uploadFiles,
+    onError: (error) => {
+      try {
+        const parsedError = JSON.parse(error.message);
+        if (parsedError.errors) {
+          Object.entries(parsedError.errors).forEach(([field, message]) => {
+            form.setError(field as keyof ProductFormSchemaType, {
+              type: "server",
+              message: message as string,
+            });
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+  });
   const handleSubmit = (values: ProductFormSchemaType) => {
-    mutate(values);
+    if (values.file) {
+      const formData = new FormData();
+      formData.append("files", values.file);
+      mutateUpload(formData).then((data) => {
+        console.log("data", data);
+        if (data) {
+          values.thumbnail = { src: data.src };
+          values.file = undefined;
+        }
+        // mutate(values);
+      });
+    }
+    // mutate(values);
   };
   useEffect(() => {
     if (product) {
@@ -108,6 +146,7 @@ export function ProductForm({ product }: ProductFormProps) {
             ? { to: new Date(product.sale_price_dates.to) }
             : {}),
         },
+        isSetSalePriceDates: !!product.sale_price_dates,
         // images: product.images?.map((img) => ({ value: img })) || [],
         regular_price: product.regular_price
           ? product.regular_price.toString()
@@ -116,6 +155,9 @@ export function ProductForm({ product }: ProductFormProps) {
       });
     }
   }, [product, form]);
+  console.log("form", form.getValues());
+
+  form.watch("file");
   return (
     <Form {...form}>
       <form
@@ -169,6 +211,7 @@ export function ProductForm({ product }: ProductFormProps) {
           </div>
           <div className="flex flex-col gap-3">
             <StatusCard />
+            <ImageThumbnail />
             <TabsCategory />
           </div>
         </div>

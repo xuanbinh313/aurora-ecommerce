@@ -12,13 +12,14 @@ export default async function SettingsProfilePage({
   const { action } = await params;
   let data: Product | undefined;
   if (action.length === 2 && action[1] === "edit") {
-    console.log("edit action");
     data = await apiFetch<Product>(`/products/${action[0]}`);
   } else if (action.length === 1 && action[0] === "create") {
     console.log("create action");
-  } else if (action.length === 1 && action[0] !== "view") {
-    console.log("view action");
-  } else {
+  }
+  // else if (action.length === 1 && action[0] !== "view") {
+  //   console.log("view action");
+  // }
+  else {
     return notFound();
   }
   return (

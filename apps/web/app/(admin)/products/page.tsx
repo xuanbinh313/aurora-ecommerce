@@ -9,8 +9,8 @@ import { DataTable } from "../components/data-table";
 import { taskSchema } from "./data/schema";
 
 export const metadata: Metadata = {
-  title: "Tasks",
-  description: "A task and issue tracker build using Tanstack Table.",
+  title: "Products",
+  description: "Products Management",
 };
 
 // Simulate a database read for tasks.
