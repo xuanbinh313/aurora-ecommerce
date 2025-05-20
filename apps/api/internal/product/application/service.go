@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	categoryService "ecommerce/internal/category/application"
+	"ecommerce/internal/common"
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
 	"ecommerce/internal/product/infra"
@@ -12,7 +13,7 @@ import (
 )
 
 type ProductService interface {
-	GetProducts(ctx context.Context) ([]domain.Product, error)
+	GetProducts(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Product], error)
 	GetProductById(ctx context.Context, id uint) (*domain.Product, error)
 	DeleteProductById(ctx context.Context, id uint) (*domain.Product, error)
 	CreateProduct(ctx context.Context, p dto.CreateProductRequestDto) error
@@ -52,6 +53,8 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 		SalePrice:        req.SalePrice.Value,
 		RegularPrice:     req.RegularPrice.Value,
 		Categories:       categories,
+		Status:           *req.Status,
+		Visibility:       *req.Visibility,
 	}
 	return p.productRepo.Create(&product)
 }
@@ -96,10 +99,9 @@ func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.P
 }
 
 // GetProducts implements Service.
-func (p *productService) GetProducts(ctx context.Context) ([]domain.Product, error) {
-	var products []domain.Product
-	err := p.productRepo.DB().Preload("Categories").Find(&products).Error
-	return products, err
+func (p *productService) GetProducts(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Product], error) {
+	response, err := p.productRepo.Find(query)
+	return response, err
 }
 
 // Hàm tạo slug duy nhất

@@ -5,12 +5,13 @@ import (
 	"ecommerce/internal/category/domain"
 	"ecommerce/internal/category/dto"
 	"ecommerce/internal/category/infra"
+	"ecommerce/internal/common"
 
 	"github.com/gosimple/slug"
 )
 
 type CategoryService interface {
-	GetCategories(ctx context.Context) ([]domain.Category, error)
+	GetCategories(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Category], error)
 	GetCategoryById(ctx context.Context, id uint) (*domain.Category, error)
 	DeleteCategoryById(ctx context.Context, id uint) (*domain.Category, error)
 	CreateCategory(ctx context.Context, p dto.CreateCategoryDto) error
@@ -96,8 +97,8 @@ func (p *categoryService) GetCategoryById(ctx context.Context, id uint) (*domain
 }
 
 // GetCategories implements Service.
-func (p *categoryService) GetCategories(ctx context.Context) ([]domain.Category, error) {
-	return p.repo.Find()
+func (p *categoryService) GetCategories(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Category], error) {
+	return p.repo.Find(query)
 }
 
 // GetCategoriesById implements Service.

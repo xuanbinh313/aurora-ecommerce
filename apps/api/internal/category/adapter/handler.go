@@ -20,7 +20,15 @@ type Handler struct {
 }
 
 func (h *Handler) GetCategories(c *gin.Context) {
-	categories, _ := h.service.GetCategories(c.Request.Context())
+	query := common.PaginationQuery{
+		Page:         common.GetIntQuery(c, "page", 1),
+		Limit:        common.GetIntQuery(c, "limit", 10),
+		Search:       c.DefaultQuery("search", ""),
+		SearchFields: []string{"name", "email"},
+		SortBy:       c.DefaultQuery("sort_by", "id"),
+		Order:        c.DefaultQuery("order", "desc"),
+	}
+	categories, _ := h.service.GetCategories(c.Request.Context(), query)
 	c.JSON(http.StatusOK, categories)
 }
 

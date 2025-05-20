@@ -14,6 +14,8 @@ type CreateProductRequestDto struct {
 	RegularPrice     utils.Float64Custom `json:"regular_price"`
 	SalePrice        utils.Float64Custom `json:"sale_price"`
 	Categories       *[]string           `json:"categories"`
+	Visibility       *string             `json:"visibility"`
+	Status           *string             `json:"status"`
 }
 
 type ProductResponse struct {

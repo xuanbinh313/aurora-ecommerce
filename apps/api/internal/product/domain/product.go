@@ -17,11 +17,12 @@ type Product struct {
 	Slug             string            `json:"slug" gorm:"uniqueIndex"`
 	ShortDescription *string           `json:"short_description"`
 	Description      *string           `json:"description"`
-	Status           *string           `json:"status"`
 	Categories       []domain.Category `json:"categories" gorm:"many2many:product_categories;constraint:OnDelete:CASCADE;"`
 	Images           []domain.Image    `json:"images" gorm:"many2many:product_images;"`
 	RegularPrice     *float64          `json:"regular_price"`
 	SalePrice        *float64          `json:"sale_price"`
+	Status           string            `json:"status"`
+	Visibility       string            `json:"visibility"`
 }
 
 type Link struct {

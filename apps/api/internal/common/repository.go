@@ -27,10 +27,12 @@ func (r *BaseRepository[T]) CreateMany(entities []T) error {
 }
 
 // FindAll finds all entities
-func (r *BaseRepository[T]) Find() ([]T, error) {
+func (r *BaseRepository[T]) Find(query PaginationQuery) (PaginationResponse[[]T], error) {
 	var entities []T
-	err := r.db.Find(&entities).Error
-	return entities, err
+	var model T
+	response, err := ApplyPaginationQuery(r.db, &model, query, &entities)
+	// err := r.db.Find(&entities).Error
+	return response, err
 }
 
 // FindById finds an entity by ID

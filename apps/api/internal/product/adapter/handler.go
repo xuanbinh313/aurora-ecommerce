@@ -20,7 +20,17 @@ type Handler struct {
 }
 
 func (h *Handler) GetProducts(c *gin.Context) {
-	products, _ := h.service.GetProducts(c.Request.Context())
+
+	query := common.PaginationQuery{
+		Page:         common.GetIntQuery(c, "page", 1),
+		Limit:        common.GetIntQuery(c, "limit", 10),
+		Search:       c.DefaultQuery("search", ""),
+		SearchFields: []string{"name"},
+		SortBy:       c.DefaultQuery("sort_by", "id"),
+		Order:        c.DefaultQuery("order", "desc"),
+		Preloads:     []string{"Categories"},
+	}
+	products, _ := h.service.GetProducts(c.Request.Context(), query)
 	c.JSON(http.StatusOK, products)
 }
 
