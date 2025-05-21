@@ -1,6 +1,7 @@
 "use server";
 import { apiFetch } from "@/app/lib/apiFetch";
-import { Product, ProductFormSchemaType } from "@/app/lib/definitions";
+import { Product } from "@/app/lib/definitions";
+import { ProductFormSchemaType } from "../lib/schemas";
 
 type FormState<T> = {
   success: boolean;
@@ -11,7 +12,7 @@ type FormState<T> = {
 export async function createProduct(payload: ProductFormSchemaType) {
   return apiFetch<Product>("/products", {
     method: "POST",
-    body: payload,
+    body: JSON.stringify(payload),
   })
 }
 

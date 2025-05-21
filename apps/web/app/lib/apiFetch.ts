@@ -1,4 +1,4 @@
-"use server"
+"use server";
 import { cookies } from "next/headers";
 
 export type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
@@ -19,15 +19,15 @@ export async function apiFetch<T>(
   // Get the token from HTTP-only cookie
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
-
+  console.log("BODY", body,headers);
   const fetchOptions: RequestInit = {
     method,
     headers: {
-      "Content-Type": "application/json",
+      // "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    ...(body ? { body } : {}),
   };
   try {
     const response = await fetch(

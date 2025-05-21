@@ -1,7 +1,7 @@
 "use server";
-import { LoginFormSchema } from "@/app/lib/definitions";
 import { createSession, deleteSession } from "@/app/lib/session";
 import { redirect } from "next/navigation";
+import { LoginFormSchema } from "../lib/schemas";
 
 export async function login(formData: FormData) {
   // Validate form fields

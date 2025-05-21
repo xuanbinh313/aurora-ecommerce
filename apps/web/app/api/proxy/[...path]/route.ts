@@ -36,9 +36,7 @@ export async function POST(
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
   const { path } = await params;
-  console.log(path);
   const endpoint = `/${path.join("/")}`;
-  console.log("Proxying to:", endpoint);
 
   try {
     const body = await req.json();
@@ -46,7 +44,6 @@ export async function POST(
       method: "POST",
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        "Content-Type": "application/json",
       },
       body,
     });

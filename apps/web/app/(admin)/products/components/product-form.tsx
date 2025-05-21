@@ -115,20 +115,18 @@ export function ProductForm({ product }: ProductFormProps) {
       }
     },
   });
-  const handleSubmit = (values: ProductFormSchemaType) => {
+  const handleSubmit = async (values: ProductFormSchemaType) => {
     if (values.file) {
       const formData = new FormData();
       formData.append("files", values.file);
-      mutateUpload(formData).then((data) => {
-        console.log("data", data);
-        if (data) {
-          values.thumbnail = { src: data.src };
-          values.file = undefined;
-        }
-        // mutate(values);
+      const res = await fetch("http://localhost:8080/api/uploads/", {
+        method: "POST",
+        body: formData,
       });
+      const data = await res.json();
+      values.thumbnail = data?.data[0];
+      mutate(values);
     }
-    // mutate(values);
   };
   useEffect(() => {
     if (product) {
@@ -155,9 +153,7 @@ export function ProductForm({ product }: ProductFormProps) {
       });
     }
   }, [product, form]);
-  console.log("form", form.getValues());
 
-  form.watch("file");
   return (
     <Form {...form}>
       <form

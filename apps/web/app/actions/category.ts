@@ -17,7 +17,7 @@ export async function createCategory(payload: FormData) {
   try {
     const res = await apiFetch<Category>("/categories", {
       method: "POST",
-      body,
+      body: JSON.stringify(body),
     });
     return {
       success: true,
@@ -34,6 +34,4 @@ export async function createCategory(payload: FormData) {
       data: null,
     };
   }
-
-
 }
