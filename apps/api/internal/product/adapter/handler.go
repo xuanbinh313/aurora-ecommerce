@@ -28,7 +28,7 @@ func (h *Handler) GetProducts(c *gin.Context) {
 		SearchFields: []string{"name"},
 		SortBy:       c.DefaultQuery("sort_by", "id"),
 		Order:        c.DefaultQuery("order", "desc"),
-		Preloads:     []string{"Categories"},
+		Preloads:     []string{"Categories", "Thumbnail"},
 	}
 	products, _ := h.service.GetProducts(c.Request.Context(), query)
 	c.JSON(http.StatusOK, products)

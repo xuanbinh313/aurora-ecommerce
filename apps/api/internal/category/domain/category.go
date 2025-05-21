@@ -33,6 +33,7 @@ type Image struct {
 	Src       string         `json:"src"`
 	Name      string         `json:"name"`
 	Alt       string         `json:"alt,omitempty"`
+	ProductID uint
 }
 
 // type Attribute struct {

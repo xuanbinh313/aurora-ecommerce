@@ -55,6 +55,7 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 		Categories:       categories,
 		Status:           *req.Status,
 		Visibility:       *req.Visibility,
+		Thumbnail:        req.Thumbnail,
 	}
 	return p.productRepo.Create(&product)
 }

@@ -23,6 +23,7 @@ type Product struct {
 	SalePrice        *float64          `json:"sale_price"`
 	Status           string            `json:"status"`
 	Visibility       string            `json:"visibility"`
+	Thumbnail        *domain.Image     `json:"thumbnail"`
 }
 
 type Link struct {

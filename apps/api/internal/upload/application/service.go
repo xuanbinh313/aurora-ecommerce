@@ -6,10 +6,11 @@ import (
 	"ecommerce/internal/upload/infra"
 	"fmt"
 	"image"
+	"image/draw"
+	"image/jpeg"
 	"image/png"
 	"mime/multipart"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -58,13 +59,22 @@ func (s *uploadService) processAndSaveFile(file *multipart.FileHeader) (*domain.
 	}
 	defer src.Close()
 
-	// Decode hình ảnh
 	img, _, err := image.Decode(src)
 	if err != nil {
 		return nil, fmt.Errorf("invalid image format: %v", err)
 	}
 
-	// Define sizes
+	srcAgain, err := file.Open() // mở lại để đọc định dạng gốc
+	if err != nil {
+		return nil, err
+	}
+	defer srcAgain.Close()
+
+	_, format, err := image.DecodeConfig(srcAgain)
+	if err != nil {
+		return nil, fmt.Errorf("cannot detect image format: %v", err)
+	}
+
 	sizes := map[string][2]int{
 		"thumbnail": {150, 150},
 		"medium":    {300, 300},
@@ -72,81 +82,66 @@ func (s *uploadService) processAndSaveFile(file *multipart.FileHeader) (*domain.
 		"original":  {0, 0},
 	}
 
-	// Generate unique filename (UUID)
-	uniqueID := uuid.New().String()
+	uid := uuid.New().String()
 	dir := fmt.Sprintf("uploads/%s/%s/", time.Now().Format("2006"), time.Now().Format("01"))
 	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 		return nil, err
 	}
 
-	// var savedFiles []string
-
-	// Save images for each size
 	for sizeName, size := range sizes {
-		// Resize image (skip resize for "original")
-		var resizedImg image.Image
-		if size[0] > 0 && size[1] > 0 {
-			resizedImg = resize.Resize(uint(size[0]), uint(size[1]), img, resize.Lanczos3)
+		var resized image.Image
+		if size[0] > 0 {
+			// Center crop thành hình vuông trước khi resize
+			cropSize := min(img.Bounds().Dx(), img.Bounds().Dy())
+			centerCropped := cropCenter(img, cropSize, cropSize)
+			resized = resize.Resize(uint(size[0]), uint(size[1]), centerCropped, resize.Lanczos3)
 		} else {
-			resizedImg = img
+			resized = img
 		}
 
-		// Generate filename
-		fileName := fmt.Sprintf("%s_%s.webp", uniqueID, sizeName)
-		filePath := filepath.Join(dir, fileName)
-
-		// Save WebP file
-		err := saveWebPImage(filePath, resizedImg)
+		outputPath := filepath.Join(dir, fmt.Sprintf("%s_%s.%s", uid, sizeName, format))
+		outFile, err := os.Create(outputPath)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("create file failed: %w", err)
 		}
-		// savedFiles = append(savedFiles, filePath)
+		defer outFile.Close()
+
+		switch format {
+		case "jpeg", "jpg":
+			err = jpeg.Encode(outFile, resized, &jpeg.Options{Quality: 85})
+		case "png":
+			err = png.Encode(outFile, resized)
+		default:
+			return nil, fmt.Errorf("unsupported image format: %s", format)
+		}
+
+		if err != nil {
+			return nil, fmt.Errorf("encode %s failed: %w", format, err)
+		}
 	}
 
-	// Create metadata
-	fileMetadata := &domain.Media{
-		Name:      uniqueID,
+	return &domain.Media{
+		Name:      uid,
 		Src:       dir,
-		MediaType: "image/webp",
-	}
-
-	return fileMetadata, nil
+		MediaType: "image/" + format,
+	}, nil
 }
+func cropCenter(img image.Image, width, height int) image.Image {
+	originalBounds := img.Bounds()
+	originalWidth := originalBounds.Dx()
+	originalHeight := originalBounds.Dy()
 
-// saveWebPImage saves an image as a WebP file
-func saveWebPImage(filePath string, img image.Image) error {
-	// Bước 1: Lưu ảnh tạm dưới dạng PNG
-	_, err := saveTempImageAsPNG(img)
-	if err != nil {
-		return err
+	// Nếu ảnh nhỏ hơn size cần crop => không crop
+	if originalWidth < width || originalHeight < height {
+		return img
 	}
 
-	// defer os.Remove(tmpInput) // Xóa ảnh tạm sau khi xong
+	startX := (originalWidth - width) / 2
+	startY := (originalHeight - height) / 2
 
-	// // Bước 2: Gọi cwebp CLI
-	// return convertToWebP(tmpInput, filePath, 85)
-	return nil
-}
+	cropRect := image.Rect(0, 0, width, height)
+	croppedImg := image.NewRGBA(cropRect)
 
-func saveTempImageAsPNG(img image.Image) (string, error) {
-	tmpFile, err := os.CreateTemp("", "img_*.png")
-	if err != nil {
-		return "", err
-	}
-	defer tmpFile.Close()
-
-	err = png.Encode(tmpFile, img)
-	if err != nil {
-		return "", err
-	}
-
-	return tmpFile.Name(), nil
-}
-func convertToWebP(inputPath, outputPath string, quality int) error {
-	cmd := exec.Command("cwebp", "-q", fmt.Sprintf("%d", quality), inputPath, "-o", outputPath)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("cwebp error: %v\n%s", err, string(output))
-	}
-	return nil
+	draw.Draw(croppedImg, cropRect, img, image.Point{X: startX, Y: startY}, draw.Src)
+	return croppedImg
 }

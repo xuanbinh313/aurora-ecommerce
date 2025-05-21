@@ -11,6 +11,7 @@ type CreateProductRequestDto struct {
 	Description      *string             `json:"description"`
 	ShortDescription *string             `json:"short_description"`
 	Images           *[]domain.Image     `json:"images"`
+	Thumbnail        *domain.Image       `json:"thumbnail"`
 	RegularPrice     utils.Float64Custom `json:"regular_price"`
 	SalePrice        utils.Float64Custom `json:"sale_price"`
 	Categories       *[]string           `json:"categories"`
