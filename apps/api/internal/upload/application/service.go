@@ -2,14 +2,16 @@ package application
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
 	"ecommerce/internal/upload/domain"
 	"ecommerce/internal/upload/infra"
+	"encoding/base64"
 	"fmt"
 	"image"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 	"time"
@@ -19,41 +21,44 @@ import (
 )
 
 type UploadService interface {
-	Upload(ctx context.Context, files []*multipart.FileHeader) ([]domain.Media, error)
+	// Upload(ctx context.Context, files []*multipart.FileHeader) ([]domain.Media, error)
+	GenerateUploadSignature(ctx context.Context, path string, expires int64) string
 }
 
 type uploadService struct {
 	repo *infra.UploadRepository
 }
 
-// Upload implements Service.
-func (s *uploadService) Upload(ctx context.Context, files []*multipart.FileHeader) ([]domain.Media, error) {
-	var medias []domain.Media
-
-	for _, file := range files {
-		fileMetadata, err := s.processAndSaveFile(file)
-		if err != nil {
-			return nil, err
-		}
-		medias = append(medias, *fileMetadata)
-	}
-
-	// Lưu tất cả metadata vào database cùng lúc
-	err := s.repo.CreateMany(medias)
-	if err != nil {
-		return nil, err
-	}
-
-	return medias, nil
+func (s *uploadService) GenerateUploadSignature(ctx context.Context, path string, expires int64) string {
+	message := fmt.Sprintf("UPLOAD:%s:%d", path, expires)
+	mac := hmac.New(sha256.New, []byte(secretKey))
+	mac.Write([]byte(message))
+	return base64.URLEncoding.EncodeToString(mac.Sum(nil))
 }
 
 func NewUpload(repo *infra.UploadRepository) UploadService {
 	return &uploadService{repo: repo}
 }
 
+// Upload implements Service.
+func (s *uploadService) Upload(ctx context.Context, file string) (*domain.Media, error) {
+	media, err := s.processAndSaveFile(file)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.repo.Create(media); err != nil {
+		return nil, err
+	}
+	return media, nil
+}
+
+const (
+	secretKey = "your-secret-key"
+)
+
 // processAndSaveFile xử lý file và trả về metadata
-func (s *uploadService) processAndSaveFile(file *multipart.FileHeader) (*domain.Media, error) {
-	src, err := file.Open()
+func (s *uploadService) processAndSaveFile(file string) (*domain.Media, error) {
+	src, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +69,7 @@ func (s *uploadService) processAndSaveFile(file *multipart.FileHeader) (*domain.
 		return nil, fmt.Errorf("invalid image format: %v", err)
 	}
 
-	srcAgain, err := file.Open() // mở lại để đọc định dạng gốc
+	srcAgain, err := os.Open(file) // mở lại để đọc định dạng gốc
 	if err != nil {
 		return nil, err
 	}

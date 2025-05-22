@@ -3,8 +3,11 @@ package upload
 import (
 	"ecommerce/internal/upload/application"
 	"fmt"
+	"io"
 	"net/http"
-	"reflect"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,28 +20,61 @@ type Handler struct {
 	service application.UploadService
 }
 
-func (h *Handler) UploadMediaFile(c *gin.Context) {
-	form, err := c.MultipartForm()
-	if err != nil {
-		fmt.Println("Form parse error:", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid multipart form"})
+func (h *Handler) GetPresignedURL(c *gin.Context) {
+	var req struct {
+		FileNames []string `json:"file_names"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+	expires := time.Now().Add(5 * time.Minute).Unix()
+	urls := make([]string, 0, len(req.FileNames))
+	for _, name := range req.FileNames {
+		signature := h.service.GenerateUploadSignature(c.Request.Context(), name, expires)
+		url := fmt.Sprintf("http://localhost:8080/api/uploads/presigned-url?file=%s&expires=%d&sig=%s", name, expires, signature)
+		urls = append(urls, url)
+	}
+	c.JSON(http.StatusOK, gin.H{"urls": urls})
+}
+
+func (h *Handler) UploadByPresignedURL(c *gin.Context) {
+	file := c.Query("file")
+	expireStr := c.Query("expires")
+	sig := c.Query("sig")
+	expires, err := strconv.ParseInt(expireStr, 10, 64)
+
+	if err != nil || time.Now().Unix() > expires {
+		c.String(http.StatusForbidden, "URL expired")
 		return
 	}
 
-	if form == nil || len(form.File) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No files in form data"})
+	expectedSig := h.service.GenerateUploadSignature(c.Request.Context(), file, expires)
+	if sig != expectedSig {
+		c.String(http.StatusForbidden, "invalid signature")
+		return
+	}
+	tmpPath := "./tmp/" + file
+	if err := os.MkdirAll("./tmp", os.ModePerm); err != nil {
+		fmt.Println("Cannot create folder tmp")
+		c.String(http.StatusInternalServerError, "server error")
+		return
+	}
+	out, err := os.Create(tmpPath)
+	if err != nil {
+		c.String(http.StatusBadRequest, "Cannot create file")
 		return
 	}
 
-	fmt.Printf("DEBUG form.File keys: %v\n", reflect.ValueOf(form.File).MapKeys())
-	fmt.Println(form)
-	files := form.File["files"]
-	medias, err := h.service.Upload(c.Request.Context(), files)
+	defer out.Close()
+
+	_, err = io.Copy(out, c.Request.Body)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusBadRequest, "Upload failed")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Files uploaded successfully", "data": medias})
+
+	c.String(http.StatusOK, "Upload success")
 }
 
 func NewHandler(service application.UploadService) *Handler {
@@ -48,6 +84,7 @@ func NewHandler(service application.UploadService) *Handler {
 func (h *Handler) RegisterRouter(r *gin.RouterGroup) {
 	uploadGroup := r.Group("/uploads")
 	{
-		uploadGroup.POST("/", h.UploadMediaFile)
+		uploadGroup.POST("/presigned-url", h.GetPresignedURL)
+		uploadGroup.PUT("/presigned-url", h.UploadByPresignedURL)
 	}
 }
