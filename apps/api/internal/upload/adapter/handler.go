@@ -56,7 +56,6 @@ func (h *Handler) UploadByPresignedURL(c *gin.Context) {
 	}
 	tmpPath := "./tmp/" + file
 	if err := os.MkdirAll("./tmp", os.ModePerm); err != nil {
-		fmt.Println("Cannot create folder tmp")
 		c.String(http.StatusInternalServerError, "server error")
 		return
 	}
@@ -73,8 +72,13 @@ func (h *Handler) UploadByPresignedURL(c *gin.Context) {
 		c.String(http.StatusBadRequest, "Upload failed")
 		return
 	}
-
-	c.String(http.StatusOK, "Upload success")
+	image, err := h.service.Upload(c.Request.Context(), tmpPath)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	fmt.Println("MEDIA CHECK", image)
+	c.JSON(http.StatusOK, gin.H{"url": image})
 }
 
 func NewHandler(service application.UploadService) *Handler {

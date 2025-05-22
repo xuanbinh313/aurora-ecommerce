@@ -92,7 +92,7 @@ func (p *productService) DeleteProductById(ctx context.Context, id uint) (*domai
 // GetProductById implements Service.
 func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.Product, error) {
 	var product domain.Product
-	err := p.productRepo.BaseRepository.DB().Preload("Categories").First(&product, id).Error
+	err := p.productRepo.BaseRepository.DB().Preload("Categories").Preload("Thumbnail").First(&product, id).Error
 	if err != nil {
 		return nil, err
 	}

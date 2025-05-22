@@ -21,7 +21,7 @@ import (
 )
 
 type UploadService interface {
-	// Upload(ctx context.Context, files []*multipart.FileHeader) ([]domain.Media, error)
+	Upload(ctx context.Context, file string) (*domain.Media, error)
 	GenerateUploadSignature(ctx context.Context, path string, expires int64) string
 }
 
