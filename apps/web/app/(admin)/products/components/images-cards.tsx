@@ -16,7 +16,6 @@ import { useFormContext } from "react-hook-form";
 const ImageThumbnail = () => {
   const form = useFormContext<ProductFormSchemaType>();
   const [previewUrl, setPreviewUrl] = useState<string>("/next.svg");
-  console.log("ImageThumbnail", form.getValues());
   return (
     <Card>
       <CardContent className="space-y-2">

@@ -24,6 +24,7 @@ import TabsCategory from "./tabs-category";
 import ImageThumbnail from "./images-cards";
 import { uploadFiles } from "@/app/actions/upload";
 import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
+import { redirect, useRouter } from "next/navigation";
 
 interface ProductFormProps {
   product?: Product;
@@ -32,6 +33,7 @@ interface ProductFormProps {
 
 export function FormProduct({ product, type = "create" }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter()
   const form = useForm<ProductFormSchemaType>({
     defaultValues: {
       id: undefined,
@@ -59,12 +61,13 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
     onSuccess: (data) => {
       toast({
         description: (
-          <span>
+          <div className="flex">
             <CircleCheck color="green" />
             Product created successfully
-          </span>
+          </div>
         ),
       });
+      router.push(`/products`);
     },
     onError: (error) => {
       try {
@@ -130,19 +133,24 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           }),
         }
       );
-      const dataURL = await resURL.json();
-      const uploadUrls = dataURL.urls;
-      const res = await fetch(uploadUrls[0], {
-        method: "PUT",
-        body: values.file,
-      });
-      const data = await res.json();
-      values.thumbnail = data?.data[0];
-      console.log(data);
+      try {
+        const dataURL = await resURL.json();
+        const uploadUrls = dataURL.urls;
+        const res = await fetch(uploadUrls[0], {
+          method: "PUT",
+          body: values.file,
+        });
+        const data = await res.json();
+        values.thumbnail = data?.url;
+        mutate(values)
+      } catch (error) {
+        console.log("Error", error);
+      }
     }
   };
   useEffect(() => {
     if (product) {
+      console.log ("product", product);
       form.reset({
         ...product,
         categories: product.categories.map((category) =>
