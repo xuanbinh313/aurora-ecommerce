@@ -27,9 +27,10 @@ import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
 
 interface ProductFormProps {
   product?: Product;
+  type?: "create" | "edit";
 }
 
-export function ProductForm({ product }: ProductFormProps) {
+export function FormProduct({ product, type = "create" }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<ProductFormSchemaType>({
     defaultValues: {
@@ -117,15 +118,27 @@ export function ProductForm({ product }: ProductFormProps) {
   });
   const handleSubmit = async (values: ProductFormSchemaType) => {
     if (values.file) {
-      const formData = new FormData();
-      formData.append("files", values.file);
-      const res = await fetch("http://localhost:8080/api/uploads/", {
-        method: "POST",
-        body: formData,
+      const resURL = await fetch(
+        `http://localhost:8080/api/uploads/presigned-url`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            file_names: [values.file.name],
+          }),
+        }
+      );
+      const dataURL = await resURL.json();
+      const uploadUrls = dataURL.urls;
+      const res = await fetch(uploadUrls[0], {
+        method: "PUT",
+        body: values.file,
       });
       const data = await res.json();
       values.thumbnail = data?.data[0];
-      mutate(values);
+      console.log(data);
     }
   };
   useEffect(() => {
@@ -177,19 +190,21 @@ export function ProductForm({ product }: ProductFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Slug" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {type === "edit" && (
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Slug</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Slug" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="short_description"

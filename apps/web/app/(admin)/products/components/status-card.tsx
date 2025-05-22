@@ -1,4 +1,8 @@
-import { ProductFormSchemaType, StatusEnum, VisibilityEnum } from "@/app/lib/schemas";
+import {
+  ProductFormSchemaType,
+  StatusEnum,
+  VisibilityEnum,
+} from "@/app/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
@@ -6,7 +10,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import {
   Select,
@@ -16,6 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFormContext } from "react-hook-form";
+
+const Status = [
+  { value: StatusEnum.options[0], label: "Draft" },
+  { value: StatusEnum.options[1], label: "Published" },
+];
+const Visibility = [
+  { value: VisibilityEnum.options[0], label: "Private" },
+  { value: VisibilityEnum.options[1], label: "Public" },
+];
 
 const StatusCard = () => {
   const form = useFormContext<ProductFormSchemaType>();
@@ -49,9 +62,9 @@ const StatusCard = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {StatusEnum.options.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
+                    {Status.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -85,9 +98,9 @@ const StatusCard = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {VisibilityEnum.options.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
+                    {Visibility.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

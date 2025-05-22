@@ -33,12 +33,12 @@ export const ProductFormSchema = z.object({
     //   .optional(),
     thumbnail: z.object({
         src: z.string(),
-    }).optional(),
+    }).optional().nullable(),
     regular_price: z.string().optional(),
     sale_price: z.string().optional(),
     sale_price_dates: z.object({
-        from: z.date().optional(),
-        to: z.date().optional(),
+        from: z.date(),
+        to: z.date(),
     }).optional(),
     isSetSalePriceDates: z.boolean(),
     status: StatusEnum,

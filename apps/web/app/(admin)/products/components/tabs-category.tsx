@@ -3,7 +3,6 @@ import { apiFetch } from "@/app/lib/apiFetch";
 import {
   Category,
   PaginationResponse,
-  ProductFormSchemaType,
 } from "@/app/lib/definitions";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +30,7 @@ import { Fragment, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { z } from "zod";
 import FormCategory from "./form-category";
+import { ProductFormSchemaType } from "@/app/lib/schemas";
 
 const FormSchema = z.object({
   categories: z

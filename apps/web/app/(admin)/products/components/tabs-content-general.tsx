@@ -1,4 +1,4 @@
-import { ProductFormSchemaType } from "@/app/lib/definitions";
+import { ProductFormSchemaType } from "@/app/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
@@ -71,6 +71,10 @@ export function TabsContentGeneral() {
               type="button"
               onClick={() => {
                 form.setValue("isSetSalePriceDates", !isSetSalePriceDates);
+                form.setValue("sale_price_dates", {
+                  from: new Date(),
+                  to: addDays(new Date(), 7),
+                });
               }}
               variant={"link"}
             >

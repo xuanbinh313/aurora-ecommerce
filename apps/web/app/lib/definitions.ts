@@ -3,22 +3,22 @@ import { StatusEnum, VisibilityEnum } from "./schemas";
 
 export type LoginFormState =
   | {
-    errors?: {
-      email?: string[];
-      password?: string[];
-    };
-    message?: string;
-  }
+      errors?: {
+        email?: string[];
+        password?: string[];
+      };
+      message?: string;
+    }
   | undefined;
 
 export type CategoryFormState =
   | {
-    errors?: {
-      name?: string[];
-      parent_id?: string[];
-    };
-    message?: string;
-  }
+      errors?: {
+        name?: string[];
+        parent_id?: string[];
+      };
+      message?: string;
+    }
   | undefined;
 
 export type Category = {
@@ -28,7 +28,6 @@ export type Category = {
   created_at: string;
   updated_at: string;
 };
-
 
 export interface Product {
   id: number;
@@ -41,7 +40,7 @@ export interface Product {
   categories: Category[];
   created_at: string;
   updated_at: string;
-  sale_price_dates: {
+  sale_price_dates?: {
     from: string;
     to: string;
   };
