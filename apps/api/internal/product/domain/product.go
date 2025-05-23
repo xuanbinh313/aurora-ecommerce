@@ -25,7 +25,7 @@ type Product struct {
 	Status           string                    `json:"status"`
 	Visibility       string                    `json:"visibility"`
 	ThumbnailID      *uint                     `json:"thumbnail_id"`
-	Thumbnail        *domainUpload.Media       `json:"thumbnail" gorm:"foreignKey:ThumbnailID"`
+	Thumbnail        *domainUpload.Media       `json:"thumbnail" gorm:"foreignKey:ThumbnailID;constrain:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
 type Link struct {

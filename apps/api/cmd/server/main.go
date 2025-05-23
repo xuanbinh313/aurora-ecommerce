@@ -25,7 +25,7 @@ func main() {
 	db := db.GetDB()
 	r := gin.Default()
 	// Serve static files from uploads folder
-	r.Static("/static", filepath.Join("./uploads"))
+	r.Static("/uploads", filepath.Join("./uploads"))
 	// Cấu hình CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5000"},
