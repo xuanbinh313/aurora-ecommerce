@@ -21,18 +21,10 @@ export const ProductFormSchema = z.object({
     slug: z.string().optional(),
     short_description: z.string().optional(),
     categories: z.array(z.string()),
-    // .refine((value) => value.some((item) => item), {
-    //   message: "You have to select at least one item.",
-    // }),
-    // images: z
-    //   .array(
-    //     z.object({
-    //       value: z.string().url({ message: "Please enter a valid URL." }),
-    //     })
-    //   )
-    //   .optional(),
     thumbnail: z.object({
         src: z.string(),
+        name: z.string(),
+        media_type: z.string()
     }).optional().nullable(),
     regular_price: z.string().optional(),
     sale_price: z.string().optional(),
@@ -43,23 +35,28 @@ export const ProductFormSchema = z.object({
     isSetSalePriceDates: z.boolean(),
     status: StatusEnum,
     visibility: VisibilityEnum,
-    file: z
-        .any()
-        .refine((file) => file instanceof File, {
-            message: "File không hợp lệ",
-        })
-        .refine((file) => file.size <= 2 * 1024 * 1024, {
-            message: "File size must be less than 2MB",
-        })
-        .refine(
-            (file) => {
-                const validTypes = ["image/jpeg", "image/png", "image/gif"];
-                return validTypes.includes(file.type);
-            },
-            {
-                message: "Only JPEG, PNG and GIF files are allowed",
+    files: z.custom<FileList>((val) => {
+        if (!(val instanceof FileList)) {
+            throw new Error("Invalid input: must be a file upload.");
+        }
+
+        if (val.length === 0) {
+            throw new Error("Please upload at least one image.");
+        }
+
+        if (val.length > 5) {
+            throw new Error("You can upload a maximum of 5 images.");
+        }
+
+        for (const file of Array.from(val)) {
+            if (!file.type.startsWith("image/")) {
+                throw new Error(`File "${file.name}" is not an image.`);
             }
-        )
-        .optional(),
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error(`File "${file.name}" is larger than 5MB.`);
+            }
+        }
+        return true;
+    }).optional()
 });
 export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;

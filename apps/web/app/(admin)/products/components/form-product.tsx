@@ -25,6 +25,7 @@ import ImageThumbnail from "./images-cards";
 import { uploadFiles } from "@/app/actions/upload";
 import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
 import { redirect, useRouter } from "next/navigation";
+import { uploadPresignedURL } from "@/app/lib/apiClient";
 
 interface ProductFormProps {
   product?: Product;
@@ -33,7 +34,7 @@ interface ProductFormProps {
 
 export function FormProduct({ product, type = "create" }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const router = useRouter()
+  const router = useRouter();
   const form = useForm<ProductFormSchemaType>({
     defaultValues: {
       id: undefined,
@@ -50,13 +51,13 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       isSetSalePriceDates: false,
       status: "DRAFT",
       visibility: "PRIVATE",
-      file: undefined,
+      files: undefined,
       thumbnail: undefined,
     },
     resolver: zodResolver(ProductFormSchema),
   });
 
-  const { data, mutate } = useMutation({
+  const { data, mutate: mutateCreateProduct } = useMutation({
     mutationFn: createProduct,
     onSuccess: (data) => {
       toast({
@@ -120,29 +121,12 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
     },
   });
   const handleSubmit = async (values: ProductFormSchemaType) => {
-    if (values.file) {
-      const resURL = await fetch(
-        `http://localhost:8080/api/uploads/presigned-url`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            file_names: [values.file.name],
-          }),
-        }
-      );
+    const { files, ...rest } = values;
+    if (values?.files && values?.files?.length > 0) {
       try {
-        const dataURL = await resURL.json();
-        const uploadUrls = dataURL.urls;
-        const res = await fetch(uploadUrls[0], {
-          method: "PUT",
-          body: values.file,
-        });
-        const data = await res.json();
-        values.thumbnail = data?.url;
-        mutate(values)
+        const uploadData = await uploadPresignedURL(values.files);
+        rest.thumbnail = uploadData?.[0].url;
+        mutateCreateProduct(rest);
       } catch (error) {
         console.log("Error", error);
       }
@@ -150,7 +134,6 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
   };
   useEffect(() => {
     if (product) {
-      console.log ("product", product);
       form.reset({
         ...product,
         categories: product.categories.map((category) =>
