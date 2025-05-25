@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	config.LoadEnv()
+	config.LoadConfig()
 	dir, _ := os.Getwd()
 	fmt.Println("Current working dir:", dir)
 	db := db.GetDB()

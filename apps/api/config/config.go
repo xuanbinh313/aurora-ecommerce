@@ -2,25 +2,10 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
-
-func LoadEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println(".env file not found. Using system env.")
-	}
-}
-
-func GetEnv(key string, fallback string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return fallback
-}
 
 type Config struct {
 	DBHost   string
@@ -33,7 +18,8 @@ type Config struct {
 
 // LoadConfig đọc cấu hình từ file .env
 func LoadConfig() (*Config, error) {
-	err := godotenv.Load(".env")
+	// err := godotenv.Load("../../.env") // only load in debug mode
+	err := godotenv.Load()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load .env file: %v", err)
 	}

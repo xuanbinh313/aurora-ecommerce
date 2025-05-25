@@ -1,7 +1,6 @@
 package main
 
 import (
-	"ecommerce/config"
 	categoryAdapter "ecommerce/internal/category/adapter"
 	categoryApplication "ecommerce/internal/category/application"
 	categoryInfra "ecommerce/internal/category/infra"
@@ -13,7 +12,7 @@ import (
 	uploadApplication "ecommerce/internal/upload/application"
 	uploadInfra "ecommerce/internal/upload/infra"
 	"fmt"
-	"path/filepath"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -21,11 +20,11 @@ import (
 )
 
 func main() {
-	config.LoadEnv()
 	db := db.GetDB()
 	r := gin.Default()
 	// Serve static files from uploads folder
-	r.Static("/uploads", filepath.Join("./uploads"))
+	r.Static("/uploads", "./uploads")
+	fmt.Println(os.Getwd())
 	// Cấu hình CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5000"},

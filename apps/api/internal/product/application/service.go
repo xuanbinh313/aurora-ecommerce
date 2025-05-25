@@ -56,6 +56,7 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 		Status:           *req.Status,
 		Visibility:       *req.Visibility,
 		Thumbnail:        req.Thumbnail,
+		Images:           req.Images,
 	}
 	return p.productRepo.Create(&product)
 }
@@ -70,7 +71,14 @@ func (p *productService) UpdateProduct(ctx context.Context, id uint, updatedProd
 	// Update fields
 	existingProduct.Name = updatedProduct.Name
 	existingProduct.Slug = updatedProduct.Slug
-	existingProduct.Description = updatedProduct.Description
+	existingProduct.ShortDescription = updatedProduct.ShortDescription
+	existingProduct.SalePrice = updatedProduct.SalePrice
+	existingProduct.RegularPrice = updatedProduct.RegularPrice
+	existingProduct.Categories = updatedProduct.Categories
+	existingProduct.Status = updatedProduct.Status
+	existingProduct.Images = updatedProduct.Images
+	existingProduct.Visibility = updatedProduct.Visibility
+	existingProduct.Thumbnail = updatedProduct.Thumbnail
 	existingProduct.Images = updatedProduct.Images
 
 	err = p.productRepo.Update(existingProduct)
@@ -92,7 +100,7 @@ func (p *productService) DeleteProductById(ctx context.Context, id uint) (*domai
 // GetProductById implements Service.
 func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.Product, error) {
 	var product domain.Product
-	err := p.productRepo.BaseRepository.DB().Preload("Categories").Preload("Thumbnail").First(&product, id).Error
+	err := p.productRepo.BaseRepository.DB().Preload("Categories").Preload("Thumbnail").Preload("Images").First(&product, id).Error
 	if err != nil {
 		return nil, err
 	}
