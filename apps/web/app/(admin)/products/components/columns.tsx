@@ -9,6 +9,7 @@ import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Product } from "@/app/lib/definitions";
+import Image from "next/image";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -40,7 +41,27 @@ export const columns: ColumnDef<Product>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("name")}</div>,
+    cell: ({ row }) => {
+      const thumbnail = row.original.thumbnail as Product["thumbnail"];
+      console.log(thumbnail, thumbnail?.media_type.split("/")[1]);
+      const path = thumbnail
+        ? `${process.env.NEXT_PUBLIC_ASSETS_BASE_URL}/${thumbnail.src}${thumbnail.name}_thumbnail.${thumbnail.media_type.split("/")[1]}`
+        : null;
+      return (
+        <>
+          <div className="w-[80px] flex items-center">
+            {path && (
+              <img
+                className="rounded-md w-11 h-11 object-cover"
+                src={path}
+                alt="Product Image"
+              />
+            )}
+            <strong>{row.getValue("name")}</strong>
+          </div>
+        </>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -53,7 +74,7 @@ export const columns: ColumnDef<Product>[] = [
       const categories = row.getValue("categories") as Product["categories"];
       return (
         <>
-          {categories.slice(0,2).map((cat) => (
+          {categories.slice(0, 2).map((cat) => (
             <Badge
               key={cat.id}
               variant="outline"

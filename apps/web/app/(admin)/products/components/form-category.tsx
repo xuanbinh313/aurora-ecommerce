@@ -1,6 +1,7 @@
 "use client";
 import { createCategory } from "@/app/actions/category";
-import { Category, CategoryFormSchema } from "@/app/lib/definitions";
+import { Category } from "@/app/lib/definitions";
+import { CategoryFormSchema } from "@/app/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

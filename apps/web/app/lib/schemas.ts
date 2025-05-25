@@ -35,13 +35,41 @@ export const ProductFormSchema = z.object({
     isSetSalePriceDates: z.boolean(),
     status: StatusEnum,
     visibility: VisibilityEnum,
-    files: z.custom<FileList>((val) => {
+    images: z.array(z.object({
+        src: z.string(),
+        name: z.string(),
+        media_type: z.string()
+    })),
+    thumbnail_files: z.custom<FileList>((val) => {
         if (!(val instanceof FileList)) {
             throw new Error("Invalid input: must be a file upload.");
         }
 
         if (val.length === 0) {
-            throw new Error("Please upload at least one image.");
+            throw new Error("thumbnail_files Please upload at least one image.");
+        }
+
+        if (val.length > 1) {
+            throw new Error("You can upload a maximum of 1 image.");
+        }
+
+        for (const file of Array.from(val)) {
+            if (!file.type.startsWith("image/")) {
+                throw new Error(`File "${file.name}" is not an image.`);
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error(`File "${file.name}" is larger than 5MB.`);
+            }
+        }
+        return true;
+    }).optional(),
+    gallery_files: z.custom<FileList>((val) => {
+        if (!(val instanceof FileList)) {
+            throw new Error("Invalid input: must be a file upload.");
+        }
+
+        if (val.length === 0) {
+            throw new Error("gallery_files, Please upload at least one image.");
         }
 
         if (val.length > 5) {

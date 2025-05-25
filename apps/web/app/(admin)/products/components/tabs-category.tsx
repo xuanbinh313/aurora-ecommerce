@@ -134,7 +134,7 @@ const CategoryContent = () => {
 
 const TabsCategory = () => {
   return (
-    <Tabs defaultValue="account" className="w-[400px]">
+    <Tabs defaultValue="account">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="account">All Categories</TabsTrigger>
         <TabsTrigger value="password">Most Used</TabsTrigger>

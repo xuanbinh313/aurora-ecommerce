@@ -3,22 +3,22 @@ import { StatusEnum, VisibilityEnum } from "./schemas";
 
 export type LoginFormState =
   | {
-      errors?: {
-        email?: string[];
-        password?: string[];
-      };
-      message?: string;
-    }
+    errors?: {
+      email?: string[];
+      password?: string[];
+    };
+    message?: string;
+  }
   | undefined;
 
 export type CategoryFormState =
   | {
-      errors?: {
-        name?: string[];
-        parent_id?: string[];
-      };
-      message?: string;
-    }
+    errors?: {
+      name?: string[];
+      parent_id?: string[];
+    };
+    message?: string;
+  }
   | undefined;
 
 export type Category = {
@@ -28,6 +28,12 @@ export type Category = {
   created_at: string;
   updated_at: string;
 };
+
+export type Media = {
+  src: string
+  name: string
+  media_type: string
+}
 
 export interface Product {
   id: number;
@@ -47,6 +53,8 @@ export interface Product {
   isSetSalePriceDates: boolean;
   status: z.infer<typeof StatusEnum>;
   visibility: z.infer<typeof VisibilityEnum>;
+  thumbnail?: Media
+  images: Media[]
 }
 
 export interface PaginationResponse<T> {

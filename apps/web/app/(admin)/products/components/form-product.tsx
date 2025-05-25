@@ -1,6 +1,6 @@
 "use client";
 
-import { createProduct } from "@/app/actions/product";
+import { createProduct, updateProduct } from "@/app/actions/product";
 import { Product } from "@/app/lib/definitions";
 import {
   Form,
@@ -21,11 +21,10 @@ import { useForm } from "react-hook-form";
 import { PropertiesTab } from "./properties-tabs";
 import StatusCard from "./status-card";
 import TabsCategory from "./tabs-category";
-import ImageThumbnail from "./images-cards";
-import { uploadFiles } from "@/app/actions/upload";
 import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
 import { redirect, useRouter } from "next/navigation";
 import { uploadPresignedURL } from "@/app/lib/apiClient";
+import { ImagesGallery, ImageThumbnail } from "./images-cards";
 
 interface ProductFormProps {
   product?: Product;
@@ -51,8 +50,10 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       isSetSalePriceDates: false,
       status: "DRAFT",
       visibility: "PRIVATE",
-      files: undefined,
       thumbnail: undefined,
+      images: [],
+      thumbnail_files: undefined,
+      gallery_files: undefined,
     },
     resolver: zodResolver(ProductFormSchema),
   });
@@ -94,8 +95,19 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       }
     },
   });
-  const { data: upload, mutateAsync: mutateUpload } = useMutation({
-    mutationFn: uploadFiles,
+  const { data: upload, mutate: mutateUpdateProduct } = useMutation({
+    mutationFn: updateProduct,
+    onSuccess: (data) => {
+      toast({
+        description: (
+          <div className="flex">
+            <CircleCheck color="green" />
+            Product created successfully
+          </div>
+        ),
+      });
+      router.push(`/products`);
+    },
     onError: (error) => {
       try {
         const parsedError = JSON.parse(error.message);
@@ -121,19 +133,28 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
     },
   });
   const handleSubmit = async (values: ProductFormSchemaType) => {
-    const { files, ...rest } = values;
-    if (values?.files && values?.files?.length > 0) {
+    const { thumbnail_files, gallery_files, ...rest } = values;
+    if (values?.thumbnail_files && values?.thumbnail_files?.length > 0) {
       try {
-        const uploadData = await uploadPresignedURL(values.files);
+        const uploadData = await uploadPresignedURL(values.thumbnail_files);
         rest.thumbnail = uploadData?.[0].url;
-        mutateCreateProduct(rest);
       } catch (error) {
         console.log("Error", error);
       }
     }
+    if (values?.gallery_files && values?.gallery_files?.length > 0) {
+      try {
+        const uploadData = await uploadPresignedURL(values.gallery_files);
+        rest.images = uploadData?.map((file) => file.url) || [];
+      } catch (error) {
+        console.log("Error", error);
+      }
+    }
+    rest.id ? mutateUpdateProduct(rest) : mutateCreateProduct(rest);
   };
   useEffect(() => {
     if (product) {
+      console.log("product", product);
       form.reset({
         ...product,
         categories: product.categories.map((category) =>
@@ -166,8 +187,8 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           console.log(error)
         )}
       >
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2 space-y-4">
+        <div className="grid grid-cols-5 gap-3">
+          <div className="col-span-4 space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -214,6 +235,7 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           <div className="flex flex-col gap-3">
             <StatusCard />
             <ImageThumbnail />
+            <ImagesGallery />
             <TabsCategory />
           </div>
         </div>

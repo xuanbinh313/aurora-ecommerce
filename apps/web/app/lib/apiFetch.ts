@@ -19,7 +19,7 @@ export async function apiFetch<T>(
   // Get the token from HTTP-only cookie
   const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
-  console.log("BODY", body,headers);
+  console.log("BODY", body, headers);
   const fetchOptions: RequestInit = {
     method,
     headers: {
