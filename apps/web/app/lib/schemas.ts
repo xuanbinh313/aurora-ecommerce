@@ -36,6 +36,7 @@ export const ProductFormSchema = z.object({
     status: StatusEnum,
     visibility: VisibilityEnum,
     images: z.array(z.object({
+        id: z.string(),
         src: z.string(),
         name: z.string(),
         media_type: z.string()

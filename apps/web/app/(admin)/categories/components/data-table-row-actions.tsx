@@ -13,11 +13,11 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 
-import { Product } from "@/app/lib/definitions";
+import { Category, Product } from "@/app/lib/definitions";
 import { useRouter } from "next/navigation";
 
 interface DataTableRowActionsProps {
-  row: Row<Product>;
+  row: Row<Category>;
 }
 
 export function DataTableRowActions({ row }: DataTableRowActionsProps) {

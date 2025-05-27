@@ -30,6 +30,7 @@ export type Category = {
 };
 
 export type Media = {
+  id: string
   src: string
   name: string
   media_type: string

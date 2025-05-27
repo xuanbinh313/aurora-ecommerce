@@ -178,7 +178,7 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       });
     }
   }, [product, form]);
-
+  console.log("form", form.watch("images"));
   return (
     <Form {...form}>
       <form
@@ -235,7 +235,19 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           <div className="flex flex-col gap-3">
             <StatusCard />
             <ImageThumbnail />
-            <ImagesGallery />
+            <FormField
+              control={form.control}
+              name="images"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Short Description</FormLabel>
+                  <FormControl>
+                    <ImagesGallery {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <TabsCategory />
           </div>
         </div>
