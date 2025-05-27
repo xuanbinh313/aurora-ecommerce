@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
+	"ecommerce/internal/common"
 	"ecommerce/internal/upload/domain"
 	"ecommerce/internal/upload/infra"
 	"encoding/base64"
@@ -23,10 +24,17 @@ import (
 type UploadService interface {
 	Upload(ctx context.Context, file string) (*domain.Media, error)
 	GenerateUploadSignature(ctx context.Context, path string, expires int64) string
+	GetUploads(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Media], error)
 }
 
 type uploadService struct {
 	repo *infra.UploadRepository
+}
+
+// GetUploads implements UploadService.
+func (s *uploadService) GetUploads(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Media], error) {
+	response, err := s.repo.Find(query)
+	return response, err
 }
 
 func (s *uploadService) GenerateUploadSignature(ctx context.Context, path string, expires int64) string {

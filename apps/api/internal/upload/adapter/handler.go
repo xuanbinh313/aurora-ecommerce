@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"ecommerce/internal/common"
 	"ecommerce/internal/upload/application"
 	"fmt"
 	"io"
@@ -77,8 +78,20 @@ func (h *Handler) UploadByPresignedURL(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	fmt.Println("MEDIA CHECK", image)
 	c.JSON(http.StatusOK, gin.H{"url": image})
+}
+func (h *Handler) GetUploads(c *gin.Context) {
+	query := common.PaginationQuery{
+		Page:         common.GetIntQuery(c, "page", 1),
+		Limit:        common.GetIntQuery(c, "limit", 10),
+		Search:       c.DefaultQuery("search", ""),
+		SearchFields: []string{"name"},
+		SortBy:       c.DefaultQuery("sort_by", "id"),
+		Order:        c.DefaultQuery("order", "desc"),
+		Preloads:     []string{},
+	}
+	medias, _ := h.service.GetUploads(c.Request.Context(), query)
+	c.JSON(http.StatusOK, medias)
 }
 
 func NewHandler(service application.UploadService) *Handler {
@@ -90,5 +103,6 @@ func (h *Handler) RegisterRouter(r *gin.RouterGroup) {
 	{
 		uploadGroup.POST("/presigned-url", h.GetPresignedURL)
 		uploadGroup.PUT("/presigned-url", h.UploadByPresignedURL)
+		uploadGroup.GET("/", h.GetUploads)
 	}
 }
