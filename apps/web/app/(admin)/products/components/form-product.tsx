@@ -2,6 +2,8 @@
 
 import { createProduct, updateProduct } from "@/app/actions/product";
 import { Product } from "@/app/lib/definitions";
+import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
+import { ImagesGalleryModal } from "@/components/media-modal/media-modal";
 import {
   Form,
   FormControl,
@@ -16,15 +18,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { addDays } from "date-fns";
 import { CircleCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { PropertiesTab } from "./properties-tabs";
 import StatusCard from "./status-card";
 import TabsCategory from "./tabs-category";
-import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
-import { redirect, useRouter } from "next/navigation";
-import { uploadPresignedURL } from "@/app/lib/apiClient";
-import { ImagesGallery, ImageThumbnail } from "./images-cards";
 
 interface ProductFormProps {
   product?: Product;
@@ -52,8 +51,6 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       visibility: "PRIVATE",
       thumbnail: undefined,
       images: [],
-      thumbnail_files: undefined,
-      gallery_files: undefined,
     },
     resolver: zodResolver(ProductFormSchema),
   });
@@ -133,28 +130,11 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
     },
   });
   const handleSubmit = async (values: ProductFormSchemaType) => {
-    const { thumbnail_files, gallery_files, ...rest } = values;
-    if (values?.thumbnail_files && values?.thumbnail_files?.length > 0) {
-      try {
-        const uploadData = await uploadPresignedURL(values.thumbnail_files);
-        rest.thumbnail = uploadData?.[0].url;
-      } catch (error) {
-        console.log("Error", error);
-      }
-    }
-    if (values?.gallery_files && values?.gallery_files?.length > 0) {
-      try {
-        const uploadData = await uploadPresignedURL(values.gallery_files);
-        rest.images = uploadData?.map((file) => file.url) || [];
-      } catch (error) {
-        console.log("Error", error);
-      }
-    }
-    rest.id ? mutateUpdateProduct(rest) : mutateCreateProduct(rest);
+    values.id ? mutateUpdateProduct(values) : mutateCreateProduct(values);
   };
+  
   useEffect(() => {
     if (product) {
-      console.log("product", product);
       form.reset({
         ...product,
         categories: product.categories.map((category) =>
@@ -178,7 +158,7 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       });
     }
   }, [product, form]);
-  console.log("form", form.watch("images"));
+
   return (
     <Form {...form}>
       <form
@@ -234,15 +214,27 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           </div>
           <div className="flex flex-col gap-3">
             <StatusCard />
-            <ImageThumbnail />
+            <FormField
+              control={form.control}
+              name="thumbnail"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Thumbnail</FormLabel>
+                  <FormControl>
+                    <ImagesGalleryModal {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="images"
               render={({ field }) => (
                 <FormItem className="space-y-1">
-                  <FormLabel>Short Description</FormLabel>
+                  <FormLabel>Image Gallery</FormLabel>
                   <FormControl>
-                    <ImagesGallery {...field} />
+                    <ImagesGalleryModal {...field} multiple />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

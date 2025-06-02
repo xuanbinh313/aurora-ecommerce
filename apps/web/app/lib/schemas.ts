@@ -22,6 +22,7 @@ export const ProductFormSchema = z.object({
     short_description: z.string().optional(),
     categories: z.array(z.string()),
     thumbnail: z.object({
+        id: z.string(),
         src: z.string(),
         name: z.string(),
         media_type: z.string()
@@ -41,30 +42,12 @@ export const ProductFormSchema = z.object({
         name: z.string(),
         media_type: z.string()
     })),
-    thumbnail_files: z.custom<FileList>((val) => {
-        if (!(val instanceof FileList)) {
-            throw new Error("Invalid input: must be a file upload.");
-        }
+});
 
-        if (val.length === 0) {
-            throw new Error("thumbnail_files Please upload at least one image.");
-        }
+export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;
 
-        if (val.length > 1) {
-            throw new Error("You can upload a maximum of 1 image.");
-        }
-
-        for (const file of Array.from(val)) {
-            if (!file.type.startsWith("image/")) {
-                throw new Error(`File "${file.name}" is not an image.`);
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                throw new Error(`File "${file.name}" is larger than 5MB.`);
-            }
-        }
-        return true;
-    }).optional(),
-    gallery_files: z.custom<FileList>((val) => {
+export const UploadImageSchema = z.object({
+    files: z.custom<FileList>((val) => {
         if (!(val instanceof FileList)) {
             throw new Error("Invalid input: must be a file upload.");
         }
@@ -87,5 +70,6 @@ export const ProductFormSchema = z.object({
         }
         return true;
     }).optional()
-});
-export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;
+})
+
+export type UploadImageSchemaType = z.infer<typeof UploadImageSchema>
