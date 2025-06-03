@@ -55,7 +55,7 @@ go.work.sum
 
 # Go build and cache
 /.idea/
-/.vscode/
+# /.vscode/
 /*.code-workspace
 *.log
 *.tmp
