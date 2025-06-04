@@ -19,7 +19,7 @@ type Product struct {
 	ShortDescription *string                   `json:"short_description"`
 	Description      *string                   `json:"description"`
 	Categories       []domainCategory.Category `json:"categories" gorm:"many2many:product_categories;constraint:OnDelete:CASCADE;"`
-	Images           []domainUpload.Media      `json:"images" gorm:"many2many:product_images;"`
+	Images           []domainUpload.Media      `json:"images" gorm:"many2many:product_images;constraint:OnDelete:CASCADE;"`
 	RegularPrice     *float64                  `json:"regular_price"`
 	SalePrice        *float64                  `json:"sale_price"`
 	Status           string                    `json:"status"`

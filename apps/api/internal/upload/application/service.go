@@ -25,10 +25,24 @@ type UploadService interface {
 	Upload(ctx context.Context, file string) (*domain.Media, error)
 	GenerateUploadSignature(ctx context.Context, path string, expires int64) string
 	GetUploads(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Media], error)
+	GetUploadByID(ctx context.Context, id uint) (*domain.Media, error)
+	GetUploadByIDs(ctx context.Context, ids []uint) ([]domain.Media, error)
 }
 
 type uploadService struct {
 	repo *infra.UploadRepository
+}
+
+// GetUploadByID implements UploadService.
+func (s *uploadService) GetUploadByID(ctx context.Context, id uint) (*domain.Media, error) {
+	response, err := s.repo.FindById(id)
+	return response, err
+}
+
+// GetUploadByID implements UploadService.
+func (s *uploadService) GetUploadByIDs(ctx context.Context, ids []uint) ([]domain.Media, error) {
+	response, err := s.repo.FindByNameOrIDs(ids)
+	return response, err
 }
 
 // GetUploads implements UploadService.

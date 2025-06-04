@@ -11,16 +11,6 @@
             "mode": "debug",
             "program": "./apps/api/cmd/server/main.go",
             "cwd": "./apps/api",
-            "env": {
-                "GO_ENV": "development",
-                "PORT": "8080",
-                "DB_HOST": "localhost",
-                "DB_PORT": "5432",
-                "DB_USER": "admin",
-                "DB_PASSWORD": "password",
-                "DB_NAME": "ecommerce",
-                "TIMEZONE": "UTC",
-            },
         }
     ]
 }

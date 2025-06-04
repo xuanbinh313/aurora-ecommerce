@@ -38,14 +38,15 @@ func main() {
 	categoryInfra.MigrateCategoryDB()
 	categoryRepo := categoryInfra.NewCategoryRepository(db)
 	categoryService := categoryApplication.NewCategoryService(categoryRepo)
-	// Products
-	productInfra.MigrateProductDB()
-	productRepo := productInfra.NewProductRepository(db)
-	productService := productApplication.NewProductService(productRepo, categoryService)
 	// Uploads
 	uploadInfra.MigrateUploadDB()
 	uploadRepo := uploadInfra.NewUploadRepository(db)
 	uploadService := uploadApplication.NewUpload(uploadRepo)
+	// Products
+	productInfra.MigrateProductDB()
+	productRepo := productInfra.NewProductRepository(db)
+	productService := productApplication.NewProductService(productRepo, categoryService, uploadService)
+
 	// Routers setup
 	api := r.Group("/api")
 	uploadAdapter.RegisterRouter(api, uploadService)

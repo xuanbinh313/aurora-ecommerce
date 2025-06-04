@@ -7,6 +7,7 @@ import (
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
 	"ecommerce/internal/product/infra"
+	uploadService "ecommerce/internal/upload/application"
 	"ecommerce/utils"
 
 	"github.com/gosimple/slug"
@@ -17,16 +18,17 @@ type ProductService interface {
 	GetProductById(ctx context.Context, id uint) (*domain.Product, error)
 	DeleteProductById(ctx context.Context, id uint) (*domain.Product, error)
 	CreateProduct(ctx context.Context, p dto.CreateProductRequestDto) error
-	UpdateProduct(ctx context.Context, id uint, p domain.Product) (*domain.Product, error)
+	UpdateProduct(ctx context.Context, id uint, p dto.UpdateProductRequestDto) (*domain.Product, error)
 }
 
 type productService struct {
 	productRepo     *infra.ProductRepository
 	categoryService categoryService.CategoryService
+	uploadService   uploadService.UploadService
 }
 
-func NewProductService(productRepo *infra.ProductRepository, categoryService categoryService.CategoryService) ProductService {
-	return &productService{productRepo: productRepo, categoryService: categoryService}
+func NewProductService(productRepo *infra.ProductRepository, categoryService categoryService.CategoryService, uploadService uploadService.UploadService) ProductService {
+	return &productService{productRepo: productRepo, categoryService: categoryService, uploadService: uploadService}
 }
 
 // CreateProduct implements Service.
@@ -62,24 +64,61 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 }
 
 // UpdateProduct implements Service.
-func (p *productService) UpdateProduct(ctx context.Context, id uint, updatedProduct domain.Product) (*domain.Product, error) {
+func (p *productService) UpdateProduct(ctx context.Context, id uint, req dto.UpdateProductRequestDto) (*domain.Product, error) {
 	existingProduct, err := p.productRepo.FindById(id)
 	if err != nil {
 		return nil, err
 	}
+	var categoryIDs []uint
+	if req.Categories != nil {
+		for _, cat := range *req.Categories {
+			// Try to parse as uint, if fails, treat as name
+			if id, err := utils.ParseUint(cat); err == nil {
+				categoryIDs = append(categoryIDs, id)
+			}
+		}
+	}
+	categories, err := p.categoryService.GetCategoriesByIDs(ctx, categoryIDs)
+	if err != nil {
+		return nil, err
+	}
+	var existThumbnail *uint
+	if req.ThumbnailID != nil && *req.ThumbnailID != "" {
+		thumbnailID, err := utils.ParseUint(*req.ThumbnailID)
+		if err != nil {
+			return nil, err
+		}
+		thumbnail, err := p.uploadService.GetUploadByID(ctx, thumbnailID)
+		if err != nil {
+			return nil, err
+		}
+		existThumbnail = &thumbnail.ID
+	}
+	var imageIDs []uint = []uint{}
+	if len(req.ImageIDs) > 0 {
+		for _, cat := range req.ImageIDs {
+			// Try to parse as uint, if fails, treat as name
+			if id, err := utils.ParseUint(cat); err == nil {
+				imageIDs = append(imageIDs, id)
+			}
+		}
+	}
 
+	if images, err := p.uploadService.GetUploadByIDs(ctx, imageIDs); err != nil {
+		return nil, err
+	} else {
+		existingProduct.Images = images
+	}
 	// Update fields
-	existingProduct.Name = updatedProduct.Name
-	existingProduct.Slug = updatedProduct.Slug
-	existingProduct.ShortDescription = updatedProduct.ShortDescription
-	existingProduct.SalePrice = updatedProduct.SalePrice
-	existingProduct.RegularPrice = updatedProduct.RegularPrice
-	existingProduct.Categories = updatedProduct.Categories
-	existingProduct.Status = updatedProduct.Status
-	existingProduct.Images = updatedProduct.Images
-	existingProduct.Visibility = updatedProduct.Visibility
-	existingProduct.Thumbnail = updatedProduct.Thumbnail
-	existingProduct.Images = updatedProduct.Images
+	existingProduct.Name = req.Name
+	existingProduct.Slug = req.Slug
+	existingProduct.ShortDescription = req.ShortDescription
+	existingProduct.SalePrice = req.SalePrice.Value
+	existingProduct.RegularPrice = req.RegularPrice.Value
+	existingProduct.Categories = categories
+	existingProduct.Status = req.Status
+	existingProduct.Visibility = req.Visibility
+	existingProduct.ThumbnailID = existThumbnail
 
 	err = p.productRepo.Update(existingProduct)
 	if err != nil {

@@ -42,6 +42,19 @@ func (r *BaseRepository[T]) FindById(id uint) (*T, error) {
 	return &entity, err
 }
 
+// FindByNameOrIDs tìm kiếm category với name LIKE hoặc IDs
+func (r *BaseRepository[T]) FindByNameOrIDs(ids []uint) ([]T, error) {
+	var entities []T
+	query := r.DB()
+	// Tìm kiếm với IN cho ID nếu có
+	if len(ids) > 0 {
+		query = query.Where("id IN ?", ids)
+	}
+
+	err := query.Find(&entities).Error
+	return entities, err
+}
+
 // Update an entity
 func (r *BaseRepository[T]) Update(entity *T) error {
 	return r.db.Save(entity).Error

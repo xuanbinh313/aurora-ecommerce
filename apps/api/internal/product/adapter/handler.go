@@ -79,8 +79,12 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
 		return
 	}
-	var body domain.Product
+	var body dto.UpdateProductRequestDto
 	if err := c.ShouldBindJSON(&body); err != nil {
+		if validationsErrs := domain.ParseValidationErrors(err, body); validationsErrs != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"errors": validationsErrs})
+			return
+		}
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
