@@ -52,7 +52,7 @@ export function TabSelectMediaContent<M extends boolean = false>({
   return (
     <>
       <Card>
-        <CardContent className="space-y-2 h-[60vh] overflow-y-auto">
+        <CardContent className="space-y-2 h-[50vh] overflow-y-auto">
           {multiple ? (
             <ImageCardCheckbox
               data={options || []}
@@ -117,7 +117,7 @@ export const TabUploadMediaContent = () => {
   return (
     <>
       <Card>
-        <CardContent className="space-y-2 h-[60vh] overflow-y-auto">
+        <CardContent className="space-y-2 h-[50vh] overflow-y-auto">
           <div className="flex flex-col items-center justify-center">
             {previewUrl && previewUrl.length === 0 && (
               <img

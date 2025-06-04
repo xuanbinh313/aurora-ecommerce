@@ -1,3 +1,4 @@
+import { th } from "@faker-js/faker";
 import { z } from "zod";
 
 export const LoginFormSchema = z.object({
@@ -21,12 +22,7 @@ export const ProductFormSchema = z.object({
     slug: z.string().optional(),
     short_description: z.string().optional(),
     categories: z.array(z.string()),
-    thumbnail: z.object({
-        id: z.string(),
-        src: z.string(),
-        name: z.string(),
-        media_type: z.string()
-    }).optional().nullable(),
+    thumbnail_id: z.string().optional().nullable(),
     regular_price: z.string().optional(),
     sale_price: z.string().optional(),
     sale_price_dates: z.object({
@@ -36,12 +32,7 @@ export const ProductFormSchema = z.object({
     isSetSalePriceDates: z.boolean(),
     status: StatusEnum,
     visibility: VisibilityEnum,
-    images: z.array(z.object({
-        id: z.string(),
-        src: z.string(),
-        name: z.string(),
-        media_type: z.string()
-    })),
+    image_ids: z.array(z.string()),
 });
 
 export type ProductFormSchemaType = z.infer<typeof ProductFormSchema>;

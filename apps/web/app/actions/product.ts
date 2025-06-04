@@ -16,8 +16,8 @@ export async function createProduct(payload: ProductFormSchemaType) {
   })
 }
 export async function updateProduct(payload: ProductFormSchemaType) {
-  return apiFetch<Product>("/products", {
-    method: "POST",
+  return apiFetch<Product>(`/products/${payload.id}`, {
+    method: "PUT",
     body: JSON.stringify(payload),
   })
 }

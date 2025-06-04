@@ -72,17 +72,17 @@ export const ImageCardRadio: React.FC<ImageCardRadioProps> = ({
     <>
       <RadioGroup
         onValueChange={(val) => {
-          const selectedMedia = data.find((item) => item.id === val);
+          const selectedMedia = data.find((item) => item.id.toString() === val);
           onChange(selectedMedia || null);
         }}
-        value={value ? value.id : null}
+        value={value ? value.id.toString() : null}
       >
         <div className="grid grid-cols-3 gap-4">
           {data.map((url, index) => {
             const imageUrl = `${process.env.NEXT_PUBLIC_ASSETS_BASE_URL}/${url.src}${url.name}_medium.${url.media_type.split("/")[1]}`;
             return (
               <div key={url.id}>
-                <RadioGroupItem value={url.id} id={url.name} />
+                <RadioGroupItem value={url.id.toString()} id={url.name} />
                 <Label
                   htmlFor={url.name}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

@@ -1,7 +1,7 @@
 "use client";
 
 import { createProduct, updateProduct } from "@/app/actions/product";
-import { Product } from "@/app/lib/definitions";
+import { Media, Product } from "@/app/lib/definitions";
 import { ProductFormSchema, ProductFormSchemaType } from "@/app/lib/schemas";
 import { ImagesGalleryModal } from "@/components/media-modal/media-modal";
 import {
@@ -19,7 +19,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addDays } from "date-fns";
 import { CircleCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PropertiesTab } from "./properties-tabs";
 import StatusCard from "./status-card";
@@ -33,6 +33,8 @@ interface ProductFormProps {
 export function FormProduct({ product, type = "create" }: ProductFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const [thumbnail, setThumbnail] = useState<Media | null>(null);
+  const [images, setImages] = useState<Media[]>([]);
   const form = useForm<ProductFormSchemaType>({
     defaultValues: {
       id: undefined,
@@ -49,8 +51,8 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
       isSetSalePriceDates: false,
       status: "DRAFT",
       visibility: "PRIVATE",
-      thumbnail: undefined,
-      images: [],
+      thumbnail_id: undefined,
+      image_ids: [],
     },
     resolver: zodResolver(ProductFormSchema),
   });
@@ -130,9 +132,10 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
     },
   });
   const handleSubmit = async (values: ProductFormSchemaType) => {
+    console.log("Form values:", values);
     values.id ? mutateUpdateProduct(values) : mutateCreateProduct(values);
   };
-  
+
   useEffect(() => {
     if (product) {
       form.reset({
@@ -141,24 +144,25 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           category.id.toString()
         ),
         sale_price_dates: {
-          ...(product?.sale_price_dates?.from
-            ? { from: new Date(product.sale_price_dates.from) }
-            : {}),
-
-          ...(product?.sale_price_dates?.to
-            ? { to: new Date(product.sale_price_dates.to) }
-            : {}),
+          from: product.sale_price_dates?.from
+            ? new Date(product.sale_price_dates.from)
+            : new Date(),
+          to: product.sale_price_dates?.to
+            ? new Date(product.sale_price_dates.to)
+            : addDays(new Date(), 7),
         },
         isSetSalePriceDates: !!product.sale_price_dates,
-        // images: product.images?.map((img) => ({ value: img })) || [],
+        image_ids: product.images?.map((img) => img.id.toString()) || [],
         regular_price: product.regular_price
           ? product.regular_price.toString()
           : "",
         sale_price: product.sale_price ? product.sale_price.toString() : "",
+        thumbnail_id: product.thumbnail_id?.toString() || null,
       });
     }
+    product?.thumbnail && setThumbnail(product.thumbnail);
+    product?.images.length && setImages(product.images);
   }, [product, form]);
-
   return (
     <Form {...form}>
       <form
@@ -167,8 +171,8 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
           console.log(error)
         )}
       >
-        <div className="grid grid-cols-5 gap-3">
-          <div className="col-span-4 space-y-4">
+        <div className="grid md:grid-cols-6 2xl:grid-cols-5 gap-3">
+          <div className="md:col-span-4 2xl:col-span-4 space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -212,16 +216,23 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
             />
             <PropertiesTab />
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="md:col-span-2 2xl:col-span-1 flex flex-col gap-3">
             <StatusCard />
             <FormField
               control={form.control}
-              name="thumbnail"
+              name="thumbnail_id"
               render={({ field }) => (
                 <FormItem className="space-y-1">
                   <FormLabel>Thumbnail</FormLabel>
                   <FormControl>
-                    <ImagesGalleryModal {...field} />
+                    <ImagesGalleryModal
+                      {...field}
+                      value={thumbnail}
+                      onChange={(value) => {
+                        setThumbnail(value as Media | null);
+                        field.onChange((value as Media | null)?.id?.toString());
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -229,12 +240,20 @@ export function FormProduct({ product, type = "create" }: ProductFormProps) {
             />
             <FormField
               control={form.control}
-              name="images"
+              name="image_ids"
               render={({ field }) => (
                 <FormItem className="space-y-1">
                   <FormLabel>Image Gallery</FormLabel>
                   <FormControl>
-                    <ImagesGalleryModal {...field} multiple />
+                    <ImagesGalleryModal
+                      {...field}
+                      multiple
+                      value={images || []}
+                      onChange={(value) => {
+                        field.onChange((value as Media[]).map(img=>img.id.toString()));
+                        setImages(value as Media[]);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

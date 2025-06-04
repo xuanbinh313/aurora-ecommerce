@@ -30,7 +30,7 @@ export type Category = {
 };
 
 export type Media = {
-  id: string
+  id: number
   src: string
   name: string
   media_type: string
@@ -55,6 +55,7 @@ export interface Product {
   status: z.infer<typeof StatusEnum>;
   visibility: z.infer<typeof VisibilityEnum>;
   thumbnail?: Media
+  thumbnail_id?: number
   images: Media[]
 }
 

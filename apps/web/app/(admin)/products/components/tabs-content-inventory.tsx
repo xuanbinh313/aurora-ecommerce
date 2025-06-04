@@ -1,4 +1,4 @@
-import { ProductFormSchemaType } from "@/app/lib/definitions";
+import { ProductFormSchemaType } from "@/app/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -47,9 +47,9 @@ export function TabsContentInventory() {
             name="regular_price"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel>Regular Price</FormLabel>
+                <FormLabel>SKU</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Regular Price" {...field} />
+                  <Input type="number" placeholder="SKU" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -60,9 +60,35 @@ export function TabsContentInventory() {
             name="sale_price"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel>Sale Price</FormLabel>
+                <FormLabel>Stock management</FormLabel>
                 <FormControl>
-                  <Input placeholder="Sale Price" {...field} />
+                  <Input placeholder="Stock management" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="sale_price"
+            render={({ field }) => (
+              <FormItem className="space-y-1">
+                <FormLabel>Stock status</FormLabel>
+                <FormControl>
+                  <Input placeholder="Stock management" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="sale_price"
+            render={({ field }) => (
+              <FormItem className="space-y-1">
+                <FormLabel>Sold individually</FormLabel>
+                <FormControl>
+                  <Input placeholder="Stock management" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

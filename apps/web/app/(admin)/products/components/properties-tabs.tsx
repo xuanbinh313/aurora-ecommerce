@@ -1,8 +1,8 @@
-import { ProductFormSchemaType } from "@/app/lib/definitions";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFormContext } from "react-hook-form";
 import { TabsContentGeneral } from "./tabs-content-general";
 import { TabsContentInventory } from "./tabs-content-inventory";
+import { ProductFormSchemaType } from "@/app/lib/schemas";
 
 export function PropertiesTab() {
   const form = useFormContext<ProductFormSchemaType>();

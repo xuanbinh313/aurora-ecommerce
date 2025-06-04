@@ -3,7 +3,7 @@ import { getMedias } from "@/app/actions/media";
 import { Media } from "@/app/lib/definitions";
 import {
   TabSelectMediaContent,
-  TabUploadMediaContent
+  TabUploadMediaContent,
 } from "@/components/media-modal/tabs-media-content";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +21,7 @@ import { useState } from "react";
 export interface ImagesGalleryModalProps {
   multiple?: boolean;
   value?: Media[] | Media | null;
-  onChange: (value: Media[] | Media | null) => void;
+  onChange?: (value: Media[] | Media | null) => void;
 }
 
 export function ImagesGalleryModal({
@@ -34,6 +34,10 @@ export function ImagesGalleryModal({
     queryFn: getMedias,
   });
   const [open, setOpen] = useState(false);
+  const handleChange = (newValue: Media[] | Media | null) => {
+    onChange?.(newValue);
+    setOpen(false);
+  };
   return (
     <>
       <Card>
@@ -75,7 +79,7 @@ export function ImagesGalleryModal({
           )}
         </CardContent>
       </Card>
-      <Button onClick={() => setOpen((prev) => !prev)} variant="outline">
+      <Button type="button" onClick={() => setOpen((prev) => !prev)} variant="outline">
         Add Gallery
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -96,14 +100,14 @@ export function ImagesGalleryModal({
                 <TabSelectMediaContent<true>
                   options={data?.data || []}
                   value={Array.isArray(value) ? value : []}
-                  onChange={onChange}
+                  onChange={handleChange}
                   multiple={true}
                 />
               ) : (
                 <TabSelectMediaContent
                   options={data?.data || []}
                   value={value as Media | null}
-                  onChange={onChange as (value: Media | null) => void}
+                  onChange={handleChange}
                   multiple={false}
                 />
               )}
