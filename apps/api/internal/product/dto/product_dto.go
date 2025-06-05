@@ -1,8 +1,8 @@
 package dto
 
 import (
+	"ecommerce/internal/common/utils"
 	domainUpload "ecommerce/internal/upload/domain"
-	"ecommerce/utils"
 )
 
 type CreateProductRequestDto struct {

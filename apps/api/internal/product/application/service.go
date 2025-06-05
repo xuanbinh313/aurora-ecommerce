@@ -4,11 +4,11 @@ import (
 	"context"
 	categoryService "ecommerce/internal/category/application"
 	"ecommerce/internal/common"
+	"ecommerce/internal/common/utils"
 	"ecommerce/internal/product/domain"
 	"ecommerce/internal/product/dto"
 	"ecommerce/internal/product/infra"
 	uploadService "ecommerce/internal/upload/application"
-	"ecommerce/utils"
 
 	"github.com/gosimple/slug"
 )
@@ -104,9 +104,11 @@ func (p *productService) UpdateProduct(ctx context.Context, id uint, req dto.Upd
 		}
 	}
 
-	if images, err := p.uploadService.GetUploadByIDs(ctx, imageIDs); err != nil {
-		return nil, err
-	} else {
+	if len(imageIDs) > 0 {
+		images, err := p.uploadService.GetUploadByIDs(ctx, imageIDs)
+		if err != nil {
+			return nil, common.NewAppError("BAD_REQUEST", "have problem with images", 400, nil)
+		}
 		existingProduct.Images = images
 	}
 	// Update fields

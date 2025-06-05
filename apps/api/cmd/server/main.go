@@ -5,6 +5,7 @@ import (
 	categoryApplication "ecommerce/internal/category/application"
 	categoryInfra "ecommerce/internal/category/infra"
 	"ecommerce/internal/db"
+	"ecommerce/internal/middleware"
 	productAdapter "ecommerce/internal/product/adapter"
 	productApplication "ecommerce/internal/product/application"
 	productInfra "ecommerce/internal/product/infra"
@@ -22,6 +23,7 @@ import (
 func main() {
 	db := db.GetDB()
 	r := gin.Default()
+	r.Use(middleware.ErrorHandler())
 	// Serve static files from uploads folder
 	r.Static("/uploads", "./uploads")
 	fmt.Println(os.Getwd())

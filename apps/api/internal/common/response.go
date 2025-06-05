@@ -1,7 +1,6 @@
 package common
 
 import (
-	domain "ecommerce/internal/error"
 	"math"
 	"net/http"
 
@@ -9,7 +8,7 @@ import (
 )
 
 func RespondWithError(c *gin.Context, err error) {
-	if appErr, ok := err.(*domain.AppError); ok {
+	if appErr, ok := err.(*AppError); ok {
 		c.JSON(appErr.Status, gin.H{
 			"code":    appErr.Code,
 			"message": appErr.Message,

@@ -1,6 +1,10 @@
 package common
 
-import "fmt"
+import (
+	"ecommerce/internal/common/utils"
+	"fmt"
+	"net/http"
+)
 
 type AppError struct {
 	Code    string
@@ -32,3 +36,30 @@ var (
 	ErrUnauthorized      = NewAppError("UNAUTHORIZED", "unauthorized", 401, nil)
 	ErrDuplicateResource = NewAppError("DUPLICATE", "resource already exists", 409, nil)
 )
+
+type ValidationError struct {
+	Fields  map[string]string `json:"fields"`
+	Message string            `json:"message"`
+	Code    string            `json:"error"`
+	Status  int               `json:"-"`
+}
+
+func (v ValidationError) Error() string {
+	return v.Message
+}
+func NewValidationError(fields map[string]string) ValidationError {
+	return ValidationError{
+		Fields:  fields,
+		Message: "Some fields are invalid",
+		Code:    "validation_failed",
+		Status:  http.StatusBadRequest,
+	}
+}
+func BuildValidationError(obj interface{}, fieldErrs map[string]string) error {
+	mapped := make(map[string]string)
+	for field, msg := range fieldErrs {
+		jsonField := utils.GetJSONFieldName(obj, field)
+		mapped[jsonField] = msg
+	}
+	return NewValidationError(mapped) // hoặc NewValidationError(mapped)
+}
