@@ -29,7 +29,6 @@ func generateUniqueSlug(name string) string {
 	return baseSlug
 }
 
-// parsePrice: Hàm xử lý cụ thể cho từng field price
 func ParsePrice(rawPrice interface{}) (*float64, error) {
 	switch v := rawPrice.(type) {
 	case string:
@@ -47,7 +46,7 @@ func ParsePrice(rawPrice interface{}) (*float64, error) {
 		p := float64(v)
 		return &p, nil
 	default:
-		return nil, strconv.ErrSyntax // Giá trị không hợp lệ
+		return nil, strconv.ErrSyntax
 	}
 }
 
@@ -68,6 +67,18 @@ func ParseUint(rawId interface{}) (uint, error) {
 		return uint(v), nil
 	default:
 
-		return 0, strconv.ErrSyntax // Giá trị không hợp lệ
+		return 0, strconv.ErrSyntax
 	}
+}
+
+func ParseListString(strings []string) []uint {
+	var arrStrings []uint = []uint{}
+	if len(strings) > 0 {
+		for _, cat := range strings {
+			if str, err := ParseUint(cat); err == nil {
+				arrStrings = append(arrStrings, str)
+			}
+		}
+	}
+	return arrStrings
 }

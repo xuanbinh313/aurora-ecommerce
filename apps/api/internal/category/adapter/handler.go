@@ -44,7 +44,8 @@ func (h *Handler) GetCategoryById(c *gin.Context) {
 	}
 	category, err := h.service.GetCategoryById(c.Request.Context(), uint(id))
 	if err != nil {
-		common.RespondWithError(c, err)
+		c.Error(err)
+		// common.RespondWithError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, category)

@@ -103,6 +103,9 @@ func (p *categoryService) GetCategories(ctx context.Context, query common.Pagina
 
 // GetCategoriesById implements Service.
 func (p *categoryService) GetCategoriesByIDs(ctx context.Context, ids []uint) ([]domain.Category, error) {
+	if len(ids) == 0 {
+		return []domain.Category{}, nil
+	}
 	return p.repo.FindByNameOrIDs(ids)
 }
 

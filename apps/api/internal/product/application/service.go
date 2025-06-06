@@ -31,18 +31,10 @@ func NewProductService(productRepo *infra.ProductRepository, categoryService cat
 	return &productService{productRepo: productRepo, categoryService: categoryService, uploadService: uploadService}
 }
 
-// CreateProduct implements Service.
 func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProductRequestDto) error {
 	var categoryIDs []uint
-	// Assuming req.Categories contains category names, join them as a comma-separated string
-	// If req.Categories contains IDs, parse them accordingly
 	if req.Categories != nil {
-		for _, cat := range *req.Categories {
-			// Try to parse as uint, if fails, treat as name
-			if id, err := utils.ParseUint(cat); err == nil {
-				categoryIDs = append(categoryIDs, id)
-			}
-		}
+		categoryIDs = utils.ParseListString(*req.Categories)
 	}
 	categories, err := p.categoryService.GetCategoriesByIDs(ctx, categoryIDs)
 	if err != nil {
@@ -63,55 +55,41 @@ func (p *productService) CreateProduct(ctx context.Context, req dto.CreateProduc
 	return p.productRepo.Create(&product)
 }
 
-// UpdateProduct implements Service.
 func (p *productService) UpdateProduct(ctx context.Context, id uint, req dto.UpdateProductRequestDto) (*domain.Product, error) {
+	fieldErrors := map[string]string{}
 	existingProduct, err := p.productRepo.FindById(id)
 	if err != nil {
-		return nil, err
+		return nil, common.ErrNotFound
 	}
 	var categoryIDs []uint
 	if req.Categories != nil {
-		for _, cat := range *req.Categories {
-			// Try to parse as uint, if fails, treat as name
-			if id, err := utils.ParseUint(cat); err == nil {
-				categoryIDs = append(categoryIDs, id)
-			}
-		}
+		categoryIDs = utils.ParseListString(*req.Categories)
 	}
 	categories, err := p.categoryService.GetCategoriesByIDs(ctx, categoryIDs)
 	if err != nil {
-		return nil, err
+		fieldErrors["Categories"] = "some IDs are invalid"
 	}
 	var existThumbnail *uint
 	if req.ThumbnailID != nil && *req.ThumbnailID != "" {
 		thumbnailID, err := utils.ParseUint(*req.ThumbnailID)
 		if err != nil {
-			return nil, err
+			fieldErrors["ThumbnailID"] = "ID is invalid format"
 		}
 		thumbnail, err := p.uploadService.GetUploadByID(ctx, thumbnailID)
 		if err != nil {
-			return nil, err
+			fieldErrors["ThumbnailID"] = "id is invalid"
 		}
 		existThumbnail = &thumbnail.ID
 	}
-	var imageIDs []uint = []uint{}
-	if len(req.ImageIDs) > 0 {
-		for _, cat := range req.ImageIDs {
-			// Try to parse as uint, if fails, treat as name
-			if id, err := utils.ParseUint(cat); err == nil {
-				imageIDs = append(imageIDs, id)
-			}
-		}
+	imageIDs := utils.ParseListString(req.ImageIDs)
+	images, err := p.uploadService.GetUploadByIDs(ctx, imageIDs)
+	if err != nil {
+		fieldErrors["ImageIDs"] = "some IDs are invalid or not found"
 	}
-
-	if len(imageIDs) > 0 {
-		images, err := p.uploadService.GetUploadByIDs(ctx, imageIDs)
-		if err != nil {
-			return nil, common.NewAppError("BAD_REQUEST", "have problem with images", 400, nil)
-		}
-		existingProduct.Images = images
+	if len(fieldErrors) > 0 {
+		return nil, common.BuildValidationError(dto.UpdateProductRequestDto{}, fieldErrors)
 	}
-	// Update fields
+	existingProduct.Images = images
 	existingProduct.Name = req.Name
 	existingProduct.Slug = req.Slug
 	existingProduct.ShortDescription = req.ShortDescription
@@ -129,7 +107,6 @@ func (p *productService) UpdateProduct(ctx context.Context, id uint, req dto.Upd
 	return existingProduct, nil
 }
 
-// DeleteProductById implements Service.
 func (p *productService) DeleteProductById(ctx context.Context, id uint) (*domain.Product, error) {
 	product, err := p.productRepo.Delete(id)
 	if err != nil {
@@ -138,7 +115,6 @@ func (p *productService) DeleteProductById(ctx context.Context, id uint) (*domai
 	return product, nil
 }
 
-// GetProductById implements Service.
 func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.Product, error) {
 	var product domain.Product
 	err := p.productRepo.BaseRepository.DB().Preload("Categories").Preload("Thumbnail").Preload("Images").First(&product, id).Error
@@ -148,13 +124,11 @@ func (p *productService) GetProductById(ctx context.Context, id uint) (*domain.P
 	return &product, nil
 }
 
-// GetProducts implements Service.
 func (p *productService) GetProducts(ctx context.Context, query common.PaginationQuery) (common.PaginationResponse[[]domain.Product], error) {
 	response, err := p.productRepo.Find(query)
 	return response, err
 }
 
-// Hàm tạo slug duy nhất
 func generateUniqueSlug(name string) string {
 	baseSlug := slug.Make(name)
 	// uniqueSlug := baseSlug
